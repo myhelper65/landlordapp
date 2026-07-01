@@ -1,0 +1,1 @@
+ALTER TABLE maintenance_requests ADD COLUMN work_order_number VARCHAR(255) UNIQUE;

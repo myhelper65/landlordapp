@@ -1,0 +1,20 @@
+-- V1.0.0__init_schema.sql
+CREATE TYPE user_role AS ENUM (
+    'SUPER_ADMIN', 'PROPERTY_MANAGER', 'LEASING_AGENT',
+    'ACCOUNTANT', 'PROPERTY_OWNER', 'TENANT',
+    'MAINTENANCE_TECH', 'VENDOR'
+);
+
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    role user_role NOT NULL,
+
+    is_deleted BOOLEAN DEFAULT FALSE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    created_by UUID
+);

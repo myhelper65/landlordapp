@@ -1,0 +1,1 @@
+ALTER TABLE maintenance_requests ALTER COLUMN photo_url TYPE TEXT;

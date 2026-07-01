@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: property-platform
+
+  # New configuration added here
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/property_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 20000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: false
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+
+cors:
+  allowed-origins: http://localhost:5173,http://localhost:5177
