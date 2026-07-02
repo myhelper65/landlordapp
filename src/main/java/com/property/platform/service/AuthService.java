@@ -69,11 +69,42 @@ public class AuthService {
 
         // 5. AuthResponseDTO'yu Builder ile dönüyoruz
         return AuthResponseDTO.builder()
-                .token(jwtToken)
-                .id(user.getId()) // Kayıt sonrası ID dönmesi React için gereklidir
-                .email(user.getEmail())
                 .role(user.getRole().name())
                 .build();
+    }
+
+    public AuthResponseDTO googleLogin(com.property.platform.dto.request.GoogleLoginRequest request) throws Exception {
+        com.google.api.client.http.HttpTransport transport = new com.google.api.client.http.javanet.NetHttpTransport();
+        com.google.api.client.json.JsonFactory jsonFactory = com.google.api.client.json.gson.GsonFactory.getDefaultInstance();
+
+        // In production, inject the Client ID from application.yml
+        String clientId = System.getenv("GOOGLE_CLIENT_ID");
+        if (clientId == null || clientId.isEmpty()) {
+            clientId = "YOUR_GOOGLE_CLIENT_ID_HERE";
+        }
+
+        com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier verifier = new com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier.Builder(transport, jsonFactory)
+                .setAudience(java.util.Collections.singletonList(clientId))
+                .build();
+
+        com.google.api.client.googleapis.auth.oauth2.GoogleIdToken idToken = verifier.verify(request.getCredential());
+        if (idToken != null) {
+            com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload payload = idToken.getPayload();
+            String email = payload.getEmail();
+
+            // Find user in DB (must be pre-provisioned by Admin)
+            var user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found. Please contact admin."));
+
+            var jwtToken = jwtService.generateToken(user);
+            return AuthResponseDTO.builder()
+                    .token(jwtToken)
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .role(user.getRole().name())
+                    .build();
+        } else {
+            throw new RuntimeException("Invalid ID token.");
+        }
     }
 }
 

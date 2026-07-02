@@ -22,3 +22,17 @@ export const logout = () => {
     localStorage.removeItem('role');
     localStorage.removeItem('email');
 };
+
+export const loginWithGoogle = async (credential) => {
+    const response = await axiosInstance.post('/auth/google', {
+        credential
+    });
+
+    if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('role', response.data.role);
+        localStorage.setItem('email', response.data.email);
+    }
+    
+    return response.data;
+};

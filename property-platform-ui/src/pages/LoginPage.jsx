@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { loginWithGoogle } from '../api/authService';
 import {
     Box, Typography, TextField, Button, Paper, InputAdornment,
     IconButton, Alert, CircularProgress, Grid, Divider
@@ -177,10 +178,17 @@ const LoginPage = () => {
 
                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
                         <GoogleLogin
-                            onSuccess={credentialResponse => {
-                                // TODO: Send credentialResponse.credential to backend
-                                console.log("Google Token:", credentialResponse);
-                                alert("Google Login successful! Token received (Check console). Backend integration is pending.");
+                            onSuccess={async (credentialResponse) => {
+                                try {
+                                    setLoading(true);
+                                    await loginWithGoogle(credentialResponse.credential);
+                                    navigate('/dashboard');
+                                } catch (err) {
+                                    console.error("Google Login Error:", err);
+                                    setError(err.response?.data?.message || 'Google Sign-In failed or user not found in system.');
+                                } finally {
+                                    setLoading(false);
+                                }
                             }}
                             onError={() => {
                                 console.log('Login Failed');

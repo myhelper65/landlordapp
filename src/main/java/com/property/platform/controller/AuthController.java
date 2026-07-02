@@ -23,4 +23,13 @@ public class AuthController {
     public ResponseEntity<AuthResponseDTO> register(@RequestBody com.property.platform.dto.request.RegisterRequestDTO request) {
         return ResponseEntity.ok(authService.register(request));
     }
+
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponseDTO> googleLogin(@RequestBody com.property.platform.dto.request.GoogleLoginRequest request) {
+        try {
+            return ResponseEntity.ok(authService.googleLogin(request));
+        } catch (Exception e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 }
