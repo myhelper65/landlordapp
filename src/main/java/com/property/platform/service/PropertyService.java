@@ -186,11 +186,38 @@ public class PropertyService {
                     .fileName(document.getFileName())
                     .fileType(document.getFileType())
                     .fileUrl(document.getFileUrl())
+                    .notes(document.getNotes())
                     .build();
 
         } catch (Exception e) {
             throw new RuntimeException("Dosya yüklenirken hata oluştu: " + e.getMessage());
         }
+    }
+
+    public void deleteDocument(UUID documentId) {
+        PropertyDocument document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Belge bulunamadı!"));
+        document.setDeleted(true);
+        documentRepository.save(document);
+    }
+
+    public com.property.platform.dto.response.DocumentDTO updateDocument(UUID documentId, String fileName, String notes) {
+        PropertyDocument document = documentRepository.findById(documentId)
+                .orElseThrow(() -> new RuntimeException("Belge bulunamadı!"));
+        
+        if (fileName != null && !fileName.trim().isEmpty()) {
+            document.setFileName(fileName);
+        }
+        document.setNotes(notes);
+        documentRepository.save(document);
+
+        return com.property.platform.dto.response.DocumentDTO.builder()
+                .id(document.getId())
+                .fileName(document.getFileName())
+                .fileType(document.getFileType())
+                .fileUrl(document.getFileUrl())
+                .notes(document.getNotes())
+                .build();
     }
 
     // --- MÜLK DETAYLARINI (KİRACI VE BELGELERLE) GETİRME METODU ---
@@ -211,6 +238,7 @@ public class PropertyService {
                         .fileName(doc.getFileName())
                         .fileType(doc.getFileType())
                         .fileUrl(doc.getFileUrl())
+                        .notes(doc.getNotes())
                         .build())
                 .collect(Collectors.toList());
 

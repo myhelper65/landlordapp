@@ -13,6 +13,7 @@ public class DocumentDTO {
     private String fileName;
     private String fileType;
     private String fileUrl;
+    private String notes;
 
 
 

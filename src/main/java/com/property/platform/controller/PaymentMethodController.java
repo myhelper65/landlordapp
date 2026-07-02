@@ -32,6 +32,19 @@ public class PaymentMethodController {
         return ResponseEntity.ok(paymentMethodRepository.findAllByUserIdAndIsDeletedFalse(tenant.getId()));
     }
 
+    @PostMapping
+    public ResponseEntity<PaymentMethod> addPaymentMethod(@RequestBody PaymentMethod request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User tenant = userRepository.findByEmail(email).orElseThrow();
+        
+        request.setUser(tenant);
+        // Ensure id is null so a new one is generated
+        request.setId(null);
+        request.setDeleted(false);
+        
+        return ResponseEntity.ok(paymentMethodRepository.save(request));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePaymentMethod(@PathVariable UUID id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

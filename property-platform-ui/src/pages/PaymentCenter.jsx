@@ -21,6 +21,15 @@ const PaymentCenter = () => {
     const [selectedMethodId, setSelectedMethodId] = useState('');
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [loadingMethods, setLoadingMethods] = useState(false);
+    const [paymentType, setPaymentType] = useState('CARD'); // CARD or ACH
+    const [newMethodData, setNewMethodData] = useState({
+        name: '',
+        number: '',
+        expiry: '',
+        cvv: '',
+        routingNumber: '',
+        accountNumber: ''
+    });
 
     const theme = {
         bgMain: '#fafafa', primary: '#1976d2', textDark: '#111827', textGrey: '#6b7280',
@@ -89,19 +98,23 @@ const PaymentCenter = () => {
         setProcessingPayment(true);
 
         try {
+            let finalMethodId = selectedMethodId;
             if (isAddingNew) {
-                // TODO: Tokenize new card details (e.g., via Stripe) and save to backend
-                console.log("Processing with NEW card details...");
-
-                // Then call the pay endpoint
-                await api.put(`/invoices/${selectedInvoice.id}/pay`);
-            } else {
-                // Processing with a saved card
-                console.log("Processing with SAVED method ID:", selectedMethodId);
-
-                // You can pass the selectedMethodId to your backend if it requires it
-                await api.put(`/invoices/${selectedInvoice.id}/pay`);
+                // Simulate Tokenization
+                const payload = {
+                    type: paymentType,
+                    brand: paymentType === 'CARD' ? (newMethodData.number.startsWith('4') ? 'Visa' : 'Mastercard') : 'Bank Account',
+                    last4: paymentType === 'CARD' ? newMethodData.number.slice(-4) || '1234' : newMethodData.accountNumber.slice(-4) || '6789',
+                    gatewayToken: 'tok_' + Math.random().toString(36).substr(2, 9),
+                    isDefault: true
+                };
+                
+                const methodRes = await api.post('/payment-methods', payload);
+                finalMethodId = methodRes.data.id;
             }
+
+            // You can pass the finalMethodId to your backend if it requires it
+            await api.put(`/invoices/${selectedInvoice.id}/pay`);
 
             // Update UI instantly
             setInvoices(prevInvoices =>
@@ -112,7 +125,7 @@ const PaymentCenter = () => {
 
             setPaymentModalOpen(false);
             setSelectedInvoice(null);
-            // Optional: Show a nice snackbar instead of alert in the future
+            setNewMethodData({ name: '', number: '', expiry: '', cvv: '', routingNumber: '', accountNumber: '' });
         } catch (error) {
             console.error("Payment error:", error);
             alert("Payment failed. Please try again.");
@@ -292,20 +305,42 @@ const PaymentCenter = () => {
                             ) : (
                                 <Box sx={{ mt: 1 }}>
                                     <FormLabel component="legend" sx={{ fontWeight: 700, color: theme.textDark, mb: 2 }}>
-                                        Enter New Card Details
+                                        Enter New Payment Details
                                     </FormLabel>
 
-                                    {/* Mock form for new card - later replace with Stripe Elements */}
-                                    <TextField fullWidth label="Cardholder Name" variant="outlined" size="small" sx={{ mb: 2 }} />
-                                    <TextField fullWidth label="Card Number" variant="outlined" size="small" sx={{ mb: 2 }} />
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={6}>
-                                            <TextField fullWidth label="MM/YY" variant="outlined" size="small" />
-                                        </Grid>
-                                        <Grid item xs={6}>
-                                            <TextField fullWidth label="CVC" variant="outlined" size="small" />
-                                        </Grid>
-                                    </Grid>
+                                    <Box sx={{ mb: 2 }}>
+                                        <Button 
+                                            variant={paymentType === 'CARD' ? 'contained' : 'outlined'} 
+                                            onClick={() => setPaymentType('CARD')}
+                                            sx={{ mr: 1, borderRadius: 2 }}
+                                        >Credit/Debit</Button>
+                                        <Button 
+                                            variant={paymentType === 'ACH' ? 'contained' : 'outlined'} 
+                                            onClick={() => setPaymentType('ACH')}
+                                            sx={{ borderRadius: 2 }}
+                                        >Bank Account (ACH)</Button>
+                                    </Box>
+
+                                    {paymentType === 'CARD' ? (
+                                        <>
+                                            <TextField fullWidth label="Cardholder Name" variant="outlined" size="small" sx={{ mb: 2 }} value={newMethodData.name} onChange={e => setNewMethodData({...newMethodData, name: e.target.value})} />
+                                            <TextField fullWidth label="Card Number" variant="outlined" size="small" sx={{ mb: 2 }} value={newMethodData.number} onChange={e => setNewMethodData({...newMethodData, number: e.target.value})} />
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={6}>
+                                                    <TextField fullWidth label="MM/YY" variant="outlined" size="small" value={newMethodData.expiry} onChange={e => setNewMethodData({...newMethodData, expiry: e.target.value})} />
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <TextField fullWidth label="CVC" variant="outlined" size="small" value={newMethodData.cvv} onChange={e => setNewMethodData({...newMethodData, cvv: e.target.value})} />
+                                                </Grid>
+                                            </Grid>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <TextField fullWidth label="Account Holder Name" variant="outlined" size="small" sx={{ mb: 2 }} value={newMethodData.name} onChange={e => setNewMethodData({...newMethodData, name: e.target.value})} />
+                                            <TextField fullWidth label="Routing Number" variant="outlined" size="small" sx={{ mb: 2 }} value={newMethodData.routingNumber} onChange={e => setNewMethodData({...newMethodData, routingNumber: e.target.value})} />
+                                            <TextField fullWidth label="Account Number" variant="outlined" size="small" sx={{ mb: 2 }} value={newMethodData.accountNumber} onChange={e => setNewMethodData({...newMethodData, accountNumber: e.target.value})} />
+                                        </>
+                                    )}
 
                                     {/* Only show "Back" button if they actually have saved cards to go back to */}
                                     {savedMethods.length > 0 && (

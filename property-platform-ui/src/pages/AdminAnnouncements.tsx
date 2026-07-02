@@ -89,68 +89,48 @@ export const AdminAnnouncements = () => {
       field: 'category',
       headerName: 'Category',
       width: 130,
-      renderCell: (params) => (
-        <Chip 
-          size="small" 
-          label={params.value} 
-          sx={{ bgcolor: '#FAFAF9', color: '#57534E', border: '1px solid #E7E5E4', fontWeight: 500 }} 
-        />
-      )
+      renderCell: (params) => <Chip size="small" label={params.value} variant="outlined" />
     },
     {
       field: 'status',
       headerName: 'Status',
       width: 120,
       renderCell: (params) => {
-        const getStatusStyle = (status: string) => {
-          switch (status) {
-            case 'PUBLISHED': return { color: '#15803D', bgcolor: '#F0FDF4', border: '1px solid #15803D40' };
-            case 'SCHEDULED': return { color: '#0369A1', bgcolor: '#F0F9FF', border: '1px solid #0369A140' };
-            case 'ARCHIVED': return { color: '#B91C1C', bgcolor: '#FEF2F2', border: '1px solid #B91C1C40' };
-            default: return { color: '#57534E', bgcolor: '#F5F5F4', border: '1px solid #E7E5E4' }; // DRAFT
-          }
-        };
-        const style = getStatusStyle(params.value);
-        return <Chip size="small" label={params.value} sx={{ ...style, fontWeight: 600, fontSize: '0.75rem' }} />;
+        const colors: any = { PUBLISHED: 'success', DRAFT: 'default', SCHEDULED: 'info', ARCHIVED: 'error' };
+        return <Chip size="small" label={params.value} color={colors[params.value]} />;
       }
     },
     {
       field: 'publishDate',
       headerName: 'Publish Date',
       width: 150,
-      renderCell: (params) => (
-        <Typography sx={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '0.85rem', color: '#57534E' }}>
-          {params.row?.publishDate ? dayjs(params.row.publishDate).format('MMM DD, YYYY') : '-'}
-        </Typography>
-      )
+      valueGetter: (params) => params.row?.publishDate ? dayjs(params.row.publishDate).format('MMM DD, YYYY') : '-'
     },
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 150,
+      width: 200,
       sortable: false,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
+        <Box>
           {params.row.status !== 'PUBLISHED' && (
-            <IconButton onClick={() => handleAction('publish', params.row.id)} size="small" sx={{ color: '#15803D' }}><Public fontSize="small" /></IconButton>
+            <IconButton onClick={() => handleAction('publish', params.row.id)} size="small" color="success"><Public /></IconButton>
           )}
           {params.row.status !== 'ARCHIVED' && (
-            <IconButton onClick={() => handleAction('archive', params.row.id)} size="small" sx={{ color: '#D97706' }}><Archive fontSize="small" /></IconButton>
+            <IconButton onClick={() => handleAction('archive', params.row.id)} size="small" color="warning"><Archive /></IconButton>
           )}
-          <IconButton onClick={() => handleAction('delete', params.row.id)} size="small" sx={{ color: '#B91C1C' }}><Delete fontSize="small" /></IconButton>
+          <IconButton onClick={() => handleAction('delete', params.row.id)} size="small" color="error"><Delete /></IconButton>
         </Box>
       )
     }
   ];
 
   return (
-    <Paper elevation={0} sx={{ p: 4, borderRadius: 2, border: '1px solid #E7E5E4', m: 3 }}>
+    <Paper sx={{ p: 3, borderRadius: 2 }}>
 
       {/* BAŞLIK VE BUTON */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, color: '#1C1917', letterSpacing: '-0.5px' }}>
-          Announcements
-        </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h5" fontWeight="bold">Announcements</Typography>
         <Button
           variant="contained"
           startIcon={<Add />}

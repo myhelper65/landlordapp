@@ -47,6 +47,11 @@ public class InvoiceController {
         return invoiceService.getAllInvoices();
     }
 
+    @GetMapping("/tenant")
+    public ResponseEntity<List<InvoiceResponseDTO>> getMyInvoices() {
+        return ResponseEntity.ok(invoiceService.getMyInvoices());
+    }
+
     // Arayüzdeki "Edit" formu için
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PutMapping("/{invoiceId}")
@@ -75,13 +80,5 @@ public class InvoiceController {
     public ResponseEntity<InvoiceResponseDTO> payInvoice(@PathVariable UUID id) {
         return ResponseEntity.ok(invoiceService.payInvoice(id));
     }
-    // Kiracının sadece kendi faturalarını görmesi için eklendi
-    @PreAuthorize("hasRole('TENANT')")
-    @GetMapping("/tenant")
-    public ResponseEntity<List<InvoiceResponseDTO>> getMyInvoices(java.security.Principal principal) {
-        // principal.getName() bize giriş yapan kullanıcının (kiracının) email veya username bilgisini verir.
-        // Bu bilgiyi kullanarak sadece ona ait faturaları veritabanından çekiyoruz.
-        List<InvoiceResponseDTO> myInvoices = invoiceService.getInvoicesForTenant(principal.getName());
-        return ResponseEntity.ok(myInvoices);
-    }
+
 }

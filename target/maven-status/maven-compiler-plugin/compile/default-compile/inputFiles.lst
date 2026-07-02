@@ -55,9 +55,11 @@ C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\c
 C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\dto\response\MaintenanceResponseDTO.java
 C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\entity\enums\UserRole.java
 C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\controller\PropertyController.java
+C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\config\OpenApiConfig.java
 C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\controller\ReportController.java
 C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\exceptions\PaymentProcessingException.java
 C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\repository\PropertyRepository.java
+C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\controller\TenantController.java
 C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\dto\response\DashboardSummaryDTO.java
 C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\dto\request\CommunityRequestDTO.java
 C:\Users\myhel\Downloads\property-platform\src\main\java\com\property\platform\repository\DocumentRepository.java

@@ -50,6 +50,7 @@ public class TenantService {
                         .fileName(doc.getFileName())
                         .fileType(doc.getFileType())
                         .fileUrl(doc.getFileUrl())
+                        .notes(doc.getNotes())
                         .build())
                 .collect(Collectors.toList());
     }

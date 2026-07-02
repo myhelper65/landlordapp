@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx
 import React from 'react';
 import { Box, List, ListItem, ListItemButton, AppIcon, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import { Dashboard, Apartment, HolidayVillage, Build, Receipt, Description } from '@mui/icons-material';
+import { Dashboard, Apartment, HolidayVillage, Build, Receipt, Description, Campaign } from '@mui/icons-material';
 import { Link, useLocation } from 'react-router-dom';
 
 const Sidebar = () => {
@@ -12,6 +12,7 @@ const Sidebar = () => {
         { text: 'Dashboard', icon: <Dashboard />, path: '/dashboard' },
         { text: 'Properties', icon: <Apartment />, path: '/properties' },
         { text: 'Communities', icon: <HolidayVillage />, path: '/communities' }, // Yeni eklenen kısım
+        { text: 'Announcements', icon: <Campaign />, path: '/announcements' },
         { text: 'Maintenance', icon: <Build />, path: '/maintenance' },
         { text: 'Invoices', icon: <Receipt />, path: '/invoices' },
         { text: 'Documents', icon: <Description />, path: '/documents' },

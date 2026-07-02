@@ -26,12 +26,11 @@ const Layout = () => {
     };
 
     // --- YÖNETİCİLER (ADMIN / SUPER_ADMIN) İÇİN MENÜ ---
-// --- YÖNETİCİLER (ADMIN / SUPER_ADMIN) İÇİN MENÜ ---
     const adminMenuItems = [
         { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
         { text: 'Properties', icon: <BusinessIcon />, path: '/properties' },
         { text: 'Communities', icon: <ApartmentIcon />, path: '/communities' },
-        { text: 'Announcements', icon: <CampaignIcon />, path: '/announcements' }, // <--- BU SATIRI EKLE
+        { text: 'Announcements', icon: <CampaignIcon />, path: '/announcements' },
         { text: 'Maintenance', icon: <BuildIcon />, path: '/maintenance' },
         { text: 'Invoices', icon: <ReceiptIcon />, path: '/invoices' },
         { text: 'Documents', icon: <DescriptionIcon />, path: '/documents' },
@@ -52,21 +51,21 @@ const Layout = () => {
     return (
         <Box sx={{ display: 'flex' }}>
             {/* ÜST MENÜ (Navbar) */}
-            <AppBar position="fixed" elevation={0} className="glass-nav" sx={{
+            <AppBar position="fixed" elevation={0} sx={{
                 width: `calc(100% - ${drawerWidth}px)`,
                 ml: `${drawerWidth}px`,
-                color: 'text.primary',
                 bgcolor: '#FFFFFF',
-                borderBottom: '1px solid #E7E5E4'
+                color: 'text.primary',
+                borderBottom: '1px solid #E2E8F0'
             }}>
-                <Toolbar>
-                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontFamily: "'Inter', sans-serif" }}>
+                <Toolbar sx={{ px: 4 }}>
+                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 700, letterSpacing: '-0.02em', color: '#0F172A' }}>
                         Property Management Platform
                     </Typography>
-                    <Typography variant="body2" sx={{ mr: 2, color: 'text.secondary', fontWeight: 500 }}>
-                        {email} <span style={{opacity: 0.6}}>({role})</span>
+                    <Typography variant="body2" sx={{ mr: 3, color: '#475569', fontWeight: 500 }}>
+                        {email} <span style={{ opacity: 0.7 }}>({role})</span>
                     </Typography>
-                    <Button color="error" startIcon={<LogoutIcon />} onClick={handleLogout} sx={{ fontWeight: 'bold' }}>
+                    <Button color="error" variant="outlined" size="small" startIcon={<LogoutIcon />} onClick={handleLogout} sx={{ fontWeight: 600, borderRadius: '8px', px: 2 }}>
                         Logout
                     </Button>
                 </Toolbar>
@@ -80,48 +79,49 @@ const Layout = () => {
                     '& .MuiDrawer-paper': { 
                         width: drawerWidth, 
                         boxSizing: 'border-box', 
-                        backgroundColor: '#1C1917', // Deep Charcoal
-                        color: '#FFFFFF',
-                        borderRight: 'none',
+                        bgcolor: '#0F172A', // Deep Blue
+                        color: 'white',
+                        borderRight: 'none'
                     },
                 }}
                 variant="permanent"
                 anchor="left"
             >
-                <Toolbar>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: '#FFFFFF', ml: 1, letterSpacing: '-0.5px' }}>
-                        {isTenant ? 'Tenant Panel' : 'Admin Panel'}
+                <Toolbar sx={{ px: 3, py: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#FFFFFF', letterSpacing: '-0.02em', fontSize: '18px' }}>
+                        {isTenant ? 'Tenant Portal' : 'Admin Portal'}
                     </Typography>
                 </Toolbar>
-                <Divider sx={{ borderColor: '#44403C' }} />
-                <List sx={{ mt: 1, px: 2 }}>
+                <Divider sx={{ bgcolor: 'rgba(255,255,255,0.08)', mb: 2 }} />
+                <List sx={{ px: 2 }}>
                     {menuItems.map((item) => {
                         const isActive = location.pathname === item.path;
                         return (
-                            <ListItem disablePadding key={item.text}>
+                            <ListItem disablePadding key={item.text} sx={{ mb: 1 }}>
                                 <ListItemButton
                                     onClick={() => navigate(item.path)}
                                     sx={{
-                                        bgcolor: isActive ? '#D97706' : 'transparent', // Amber 600
+                                        bgcolor: isActive ? '#2563EB' : 'transparent', // Lively blue background for active
                                         '&:hover': { 
-                                            bgcolor: isActive ? '#D97706' : '#292524',
+                                            bgcolor: isActive ? '#1D4ED8' : 'rgba(255,255,255,0.1)',
                                         },
-                                        mb: 0.5,
-                                        borderRadius: '6px',
-                                        transition: 'background-color 0.2s',
-                                        color: isActive ? '#FFFFFF' : '#A8A29E',
+                                        borderRadius: '8px',
+                                        py: 1.2,
+                                        px: 2,
+                                        transition: 'all 0.2s ease-in-out'
                                     }}
                                 >
-                                    <ListItemIcon sx={{ color: isActive ? '#FFFFFF' : '#A8A29E', minWidth: '40px' }}>
+                                    <ListItemIcon sx={{ color: isActive ? '#FFFFFF' : '#94A3B8', minWidth: '40px' }}>
                                         {item.icon}
                                     </ListItemIcon>
                                     <ListItemText
                                         disableTypography
                                         primary={
                                             <Typography sx={{ 
-                                                fontWeight: isActive ? 600 : 500,
-                                                fontSize: '0.9rem',
-                                                color: isActive ? '#FFFFFF' : '#A8A29E' 
+                                                fontWeight: isActive ? 600 : 500, 
+                                                fontSize: '15px', 
+                                                letterSpacing: '0.02em', 
+                                                color: isActive ? '#FFFFFF' : '#E2E8F0' 
                                             }}>
                                                 {item.text}
                                             </Typography>
@@ -137,8 +137,8 @@ const Layout = () => {
             {/* ANA İÇERİK BÖLGESİ */}
             <Box component="main" sx={{
                 flexGrow: 1,
-                bgcolor: '#FAFAF9',
-                p: 0,
+                bgcolor: 'background.default',
+                p: { xs: 2, sm: 3, md: 4 }, // Generous padding
                 minHeight: '100vh',
                 width: `calc(100% - ${drawerWidth}px)`
             }}>

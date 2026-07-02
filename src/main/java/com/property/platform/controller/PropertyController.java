@@ -85,4 +85,19 @@ public class PropertyController {
             @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
         return ResponseEntity.ok(propertyService.uploadDocument(id, file));
     }
+
+    @DeleteMapping("/documents/{documentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<Void> deleteDocument(@PathVariable UUID documentId) {
+        propertyService.deleteDocument(documentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/documents/{documentId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<com.property.platform.dto.response.DocumentDTO> updateDocument(
+            @PathVariable UUID documentId,
+            @RequestBody com.property.platform.dto.request.DocumentRequestDTO request) {
+        return ResponseEntity.ok(propertyService.updateDocument(documentId, request.getFileName(), request.getNotes()));
+    }
 }

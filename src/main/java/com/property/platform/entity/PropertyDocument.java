@@ -24,4 +24,7 @@ public class PropertyDocument extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
+
+    @Column(name = "notes", columnDefinition = "TEXT")
+    private String notes;
 }
