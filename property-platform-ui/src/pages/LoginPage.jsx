@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { loginWithGoogle } from '../api/authService';
+import { loginWithGoogle, login } from '../api/authService';
 import {
     Box, Typography, TextField, Button, Paper, InputAdornment,
     IconButton, Alert, CircularProgress, Grid, Divider
@@ -31,18 +31,15 @@ const LoginPage = () => {
         setError('');
 
         try {
-            // Backend auth endpoint'ine istek atıyoruz
-            const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/auth/login`, credentials);
+            const response = await login(credentials);
 
-            const { token, role, email } = response.data;
-
-            // Gelen verileri LocalStorage'a kaydediyoruz
-            localStorage.setItem('token', token);
-            localStorage.setItem('role', role);
-            localStorage.setItem('email', email);
-
-            // Giriş başarılı, App.js'deki DashboardRouter onu doğru panele yönlendirecek
-            navigate('/dashboard');
+            if (response.token) {
+                if (response.firstLoginRequired) {
+                    navigate('/first-setup');
+                } else {
+                    navigate('/dashboard');
+                }
+            }
 
         } catch (err) {
             console.error("Login error:", err);
@@ -181,8 +178,14 @@ const LoginPage = () => {
                             onSuccess={async (credentialResponse) => {
                                 try {
                                     setLoading(true);
-                                    await loginWithGoogle(credentialResponse.credential);
-                                    navigate('/dashboard');
+                                    const response = await loginWithGoogle(credentialResponse.credential);
+                                    if (response.token) {
+                                        if (response.firstLoginRequired) {
+                                            navigate('/first-setup');
+                                        } else {
+                                            navigate('/dashboard');
+                                        }
+                                    }
                                 } catch (err) {
                                     console.error("Google Login Error:", err);
                                     setError(err.response?.data?.message || 'Google Sign-In failed or user not found in system.');

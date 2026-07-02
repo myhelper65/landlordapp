@@ -27,6 +27,11 @@ public class AuthService {
         );
 
         var user = userRepository.findByEmail(request.getEmail()).orElseThrow();
+        
+        // Record last login
+        user.setLastLogin(java.time.Instant.now());
+        userRepository.save(user);
+
         var jwtToken = jwtService.generateToken(user);
 
         return AuthResponseDTO.builder()
@@ -34,6 +39,7 @@ public class AuthService {
                 .id(user.getId())       // BU SATIR ÖNEMLİ (FRONTEND İÇİN)
                 .email(user.getEmail())
                 .role(user.getRole().name())
+                .firstLoginRequired(user.isFirstLoginRequired())
                 .build();
     }
 
@@ -95,12 +101,17 @@ public class AuthService {
             // Find user in DB (must be pre-provisioned by Admin)
             var user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found. Please contact admin."));
 
+            // Record last login
+            user.setLastLogin(java.time.Instant.now());
+            userRepository.save(user);
+
             var jwtToken = jwtService.generateToken(user);
             return AuthResponseDTO.builder()
                     .token(jwtToken)
                     .id(user.getId())
                     .email(user.getEmail())
                     .role(user.getRole().name())
+                    .firstLoginRequired(user.isFirstLoginRequired())
                     .build();
         } else {
             throw new RuntimeException("Invalid ID token.");

@@ -4,6 +4,7 @@ import { GlobalStyles, Typography, Box } from '@mui/material';
 
 // Sayfa İçe Aktarımları
 import LoginPage from './pages/LoginPage';
+import FirstSetupPage from './pages/FirstSetupPage';
 import AdminDashboard from './pages/AdminDashboard';
 import TenantDashboard from './pages/TenantDashboard';
 import PropertiesPage from './pages/PropertiesPage';
@@ -53,11 +54,21 @@ function App() {
                 {/* Herkese Açık Rota */}
                 <Route path="/login" element={<LoginPage />} />
 
+                {/* First Setup Rota - Layout olmadan, tam ekran wizard */}
+                <Route
+                    path="/first-setup"
+                    element={
+                        <ProtectedRoute isSetupRoute={true}>
+                            <FirstSetupPage />
+                        </ProtectedRoute>
+                    }
+                />
+
                 {/* Korumalı Rota ve Layout */}
                 <Route
                     path="/"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute isSetupRoute={false}>
                             <Layout />
                         </ProtectedRoute>
                     }

@@ -21,6 +21,7 @@ export const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('email');
+    localStorage.removeItem('firstLoginRequired');
 };
 
 export const loginWithGoogle = async (credential) => {
