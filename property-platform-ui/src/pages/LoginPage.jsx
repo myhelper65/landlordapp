@@ -6,6 +6,7 @@ import {
     IconButton, Alert, CircularProgress, Grid, Divider
 } from '@mui/material';
 import { Visibility, VisibilityOff, EmailOutlined, LockOutlined, MapsHomeWork } from '@mui/icons-material';
+import { GoogleLogin } from '@react-oauth/google';
 
 const LoginPage = () => {
     const navigate = useNavigate();
@@ -169,6 +170,26 @@ const LoginPage = () => {
                             {loading ? <CircularProgress size={26} sx={{ color: '#fff' }} /> : 'Sign In'}
                         </Button>
                     </form>
+
+                    <Divider sx={{ my: 4, color: theme.textGrey, '&::before, &::after': { borderColor: theme.borderLight } }}>
+                        <Typography variant="body2" sx={{ color: theme.textGrey }}>OR</Typography>
+                    </Divider>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+                        <GoogleLogin
+                            onSuccess={credentialResponse => {
+                                // TODO: Send credentialResponse.credential to backend
+                                console.log("Google Token:", credentialResponse);
+                                alert("Google Login successful! Token received (Check console). Backend integration is pending.");
+                            }}
+                            onError={() => {
+                                console.log('Login Failed');
+                                setError('Google Sign-In failed. Please try again.');
+                            }}
+                            useOneTap
+                            shape="pill"
+                        />
+                    </Box>
 
                     <Divider sx={{ my: 4, color: theme.textGrey, '&::before, &::after': { borderColor: theme.borderLight } }}>
                         <Typography variant="body2" sx={{ color: theme.textGrey }}>SECURE PORTAL</Typography>

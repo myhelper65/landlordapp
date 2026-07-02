@@ -5,6 +5,7 @@ import com.property.platform.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,8 +31,9 @@ public class UserController {
             return ResponseEntity.badRequest().body(java.util.Map.of("message", "User with this email already exists."));
         }
 
-        // Generate a random temporary password or just use a default since they will use Google Sign In
-        String tempPassword = java.util.UUID.randomUUID().toString();
+        // For testing purposes, set a default temporary password. 
+        // In production, this would be an activation link sent via email.
+        String tempPassword = "welcome123";
 
         User newTenant = User.builder()
                 .email(request.getEmail())
@@ -43,6 +45,9 @@ public class UserController {
 
         userRepository.save(newTenant);
 
-        return ResponseEntity.ok(java.util.Map.of("message", "Tenant invited successfully.", "email", newTenant.getEmail()));
+        return ResponseEntity.ok(java.util.Map.of(
+            "message", "Tenant invited successfully. Temporary password is: " + tempPassword, 
+            "email", newTenant.getEmail()
+        ));
     }
 }
