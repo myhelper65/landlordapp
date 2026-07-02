@@ -11,7 +11,7 @@ import { Edit, Delete, PersonAdd, Visibility, CloudUpload, InsertDriveFile, Pict
 
 // Mevcut API Servislerin
 import { getAllProperties, createProperty, deleteProperty, updateProperty } from '../api/propertyService';
-import { getAllUsers } from '../api/userService';
+import { getAllUsers, inviteTenant } from '../api/userService';
 import { assignUserToProperty } from '../api/userPropertyService';
 import { getAllCommunities } from '../api/communityService';
 
@@ -24,6 +24,9 @@ const PropertiesPage = () => {
     // Form State'leri
     const [rentModalOpen, setRentModalOpen] = useState(false);
     const [rentData, setRentData] = useState({ userId: '', propertyId: '', type: 'TENANT' });
+
+    const [inviteModalOpen, setInviteModalOpen] = useState(false);
+    const [inviteData, setInviteData] = useState({ firstName: '', lastName: '', email: '' });
 
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [newProperty, setNewProperty] = useState({ communityId: '', unitNumber: '', propertyType: 'SINGLE_FAMILY' });
@@ -104,6 +107,18 @@ const PropertiesPage = () => {
             fetchData();
         } catch (error) {
             alert(error.response?.data?.message || "Failed action.");
+        }
+    };
+
+    const handleInviteSubmit = async () => {
+        try {
+            const response = await inviteTenant(inviteData);
+            alert(response.message || "Tenant invited successfully!");
+            setInviteModalOpen(false);
+            setInviteData({ firstName: '', lastName: '', email: '' });
+            fetchData(); // Refresh the users list
+        } catch (error) {
+            alert(error.response?.data?.message || "Failed to invite tenant.");
         }
     };
 
@@ -413,10 +428,33 @@ const PropertiesPage = () => {
                             ))}
                         </Select>
                     </FormControl>
+                    <Box sx={{ mt: 2, textAlign: 'center' }}>
+                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>Can't find the tenant in the list?</Typography>
+                        <Button variant="outlined" size="small" onClick={() => { setRentModalOpen(false); setInviteModalOpen(true); }}>
+                            Invite New Tenant
+                        </Button>
+                    </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setRentModalOpen(false)}>Cancel</Button>
                     <Button variant="contained" color="success" onClick={handleRentSubmit}>Confirm Rent</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* INVITE TENANT MODAL */}
+            <Dialog open={inviteModalOpen} onClose={() => setInviteModalOpen(false)} fullWidth maxWidth="sm">
+                <DialogTitle>Invite New Tenant</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                        Create a pending account for the tenant. They will use this email to log in via Google.
+                    </Typography>
+                    <TextField fullWidth margin="normal" label="First Name" value={inviteData.firstName} onChange={(e) => setInviteData({ ...inviteData, firstName: e.target.value })} required />
+                    <TextField fullWidth margin="normal" label="Last Name" value={inviteData.lastName} onChange={(e) => setInviteData({ ...inviteData, lastName: e.target.value })} required />
+                    <TextField fullWidth margin="normal" label="Email Address" type="email" value={inviteData.email} onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })} required />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setInviteModalOpen(false)}>Cancel</Button>
+                    <Button variant="contained" color="primary" onClick={handleInviteSubmit} disabled={!inviteData.email || !inviteData.firstName}>Send Invitation</Button>
                 </DialogActions>
             </Dialog>
         </Container>

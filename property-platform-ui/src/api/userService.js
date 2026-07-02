@@ -5,3 +5,8 @@ export const getAllUsers = async () => {
     const response = await axiosInstance.get('/users');
     return response.data;
 };
+
+export const inviteTenant = async (tenantData) => {
+    const response = await axiosInstance.post('/users/invite-tenant', tenantData);
+    return response.data;
+};
