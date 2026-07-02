@@ -45,6 +45,15 @@ public class MaintenanceRequest extends BaseEntity {
     @Column(unique = true, updatable = false)
     private String workOrderNumber;
 
+    @Column(name = "labor_hours")
+    private Double laborHours;
+
+    @Column(name = "outsourced")
+    private Boolean outsourced;
+
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
     public enum RequestPriority {
         LOW, MEDIUM, HIGH, URGENT
     }

@@ -11,7 +11,7 @@ const MyPayments = () => {
         const fetchInvoices = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:8080/api/v1/tenant/my-invoices', {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/tenant/my-invoices`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setInvoices(response.data);

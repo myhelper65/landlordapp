@@ -129,16 +129,31 @@ public class MaintenanceRequestService {
 
 
     // --- 2. DURUM GÜNCELLEME (ADMIN İÇİN) ---
-    public Map<String, Object> updateStatus(UUID requestId, String newStatus) {
+    public Map<String, Object> updateStatus(UUID requestId, Map<String, Object> payload) {
         MaintenanceRequest request = maintenanceRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Arıza talebi bulunamadı!"));
 
-        request.setStatus(MaintenanceRequest.RequestStatus.valueOf(newStatus));
-        request.setUpdatedAt(Instant.now());
-
-        if (newStatus.equals("RESOLVED")) {
-            request.setResolvedAt(Instant.now());
+        if (payload.containsKey("status") && payload.get("status") != null) {
+            String newStatus = (String) payload.get("status");
+            request.setStatus(MaintenanceRequest.RequestStatus.valueOf(newStatus));
+            if (newStatus.equals("RESOLVED")) {
+                request.setResolvedAt(Instant.now());
+            }
         }
+
+        if (payload.containsKey("laborHours") && payload.get("laborHours") != null) {
+            request.setLaborHours(Double.valueOf(payload.get("laborHours").toString()));
+        }
+
+        if (payload.containsKey("outsourced") && payload.get("outsourced") != null) {
+            request.setOutsourced(Boolean.valueOf(payload.get("outsourced").toString()));
+        }
+
+        if (payload.containsKey("notes")) {
+            request.setNotes((String) payload.get("notes"));
+        }
+
+        request.setUpdatedAt(Instant.now());
 
         return mapToSafeJson(maintenanceRepository.save(request));
     }
@@ -219,6 +234,9 @@ public class MaintenanceRequestService {
         map.put("workOrderNumber", req.getWorkOrderNumber());
         map.put("photoUrl", req.getPhotoUrl());
         map.put("createdAt", req.getCreatedAt());
+        map.put("laborHours", req.getLaborHours());
+        map.put("outsourced", req.getOutsourced());
+        map.put("notes", req.getNotes());
 
         if (req.getUser() != null) {
             Map<String, Object> userMap = new HashMap<>();

@@ -38,7 +38,7 @@ const PropertiesPage = () => {
     const [uploadingFiles, setUploadingFiles] = useState(false);
 
     // BASE URL for viewing files
-    const API_BASE_URL = 'http://localhost:8080';
+    const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080');
 
     const fetchData = async () => {
         try {
@@ -186,41 +186,6 @@ const PropertiesPage = () => {
         }
     };
 
-    // --- DOCUMENT EDIT & DELETE ---
-    const [editDocModalOpen, setEditDocModalOpen] = useState(false);
-    const [editDocData, setEditDocData] = useState({ id: '', fileName: '', notes: '' });
-
-    const openEditDocModal = (doc) => {
-        setEditDocData({ id: doc.id, fileName: doc.fileName || '', notes: doc.notes || '' });
-        setEditDocModalOpen(true);
-    };
-
-    const handleEditDocSubmit = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            await axios.put(`${API_BASE_URL}/api/v1/properties/documents/${editDocData.id}`, editDocData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setEditDocModalOpen(false);
-            openDetailsModal(propertyDetails.id); // Refresh the details modal
-        } catch (error) {
-            alert(error.response?.data?.message || "Error updating document.");
-        }
-    };
-
-    const handleDeleteDocument = async (docId) => {
-        if (!window.confirm("Are you sure you want to delete this document?")) return;
-        try {
-            const token = localStorage.getItem('token');
-            await axios.delete(`${API_BASE_URL}/api/v1/properties/documents/${docId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            openDetailsModal(propertyDetails.id); // Refresh the details modal
-        } catch (error) {
-            alert(error.response?.data?.message || "Error deleting document.");
-        }
-    };
-
     // Dosya türüne göre uygun ikonu/önizlemeyi render etme
     const renderFilePreview = (doc) => {
         const fileUrl = `${API_BASE_URL}${doc.fileUrl}`;
@@ -329,26 +294,15 @@ const PropertiesPage = () => {
                             <Grid container spacing={2} sx={{ mb: 3 }}>
                                 {propertyDetails.documents?.map((doc) => (
                                     <Grid item xs={12} sm={6} md={3} key={doc.id}>
-                                        <Card variant="outlined" sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                        <Card variant="outlined">
                                             {renderFilePreview(doc)}
-                                            <CardContent sx={{ p: 1, pb: "8px !important", flexGrow: 1 }}>
-                                                <Typography variant="caption" noWrap display="block" title={doc.fileName} sx={{ fontWeight: 'bold' }}>
+                                            <CardContent sx={{ p: 1, pb: "8px !important" }}>
+                                                <Typography variant="caption" noWrap display="block" title={doc.fileName}>
                                                     {doc.fileName}
                                                 </Typography>
-                                                {doc.notes && (
-                                                    <Typography variant="caption" color="textSecondary" display="block" sx={{ mt: 0.5, lineHeight: 1.2, maxHeight: '3.6em', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }} title={doc.notes}>
-                                                        {doc.notes}
-                                                    </Typography>
-                                                )}
                                             </CardContent>
-                                            <CardActions sx={{ p: 0, pb: 1, justifyContent: 'center' }}>
+                                            <CardActions sx={{ p: 0, justifyContent: 'center' }}>
                                                 <Button size="small" target="_blank" href={`${API_BASE_URL}${doc.fileUrl}`}>View</Button>
-                                                <IconButton size="small" color="primary" onClick={() => openEditDocModal(doc)} title="Edit Note">
-                                                    <Edit fontSize="small" />
-                                                </IconButton>
-                                                <IconButton size="small" color="error" onClick={() => handleDeleteDocument(doc.id)} title="Delete Document">
-                                                    <Delete fontSize="small" />
-                                                </IconButton>
                                             </CardActions>
                                         </Card>
                                     </Grid>
@@ -465,34 +419,6 @@ const PropertiesPage = () => {
                     <Button variant="contained" color="success" onClick={handleRentSubmit}>Confirm Rent</Button>
                 </DialogActions>
             </Dialog>
-
-            {/* EDIT DOCUMENT MODAL */}
-            <Dialog open={editDocModalOpen} onClose={() => setEditDocModalOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle>Edit Document Details</DialogTitle>
-                <DialogContent dividers>
-                    <TextField 
-                        fullWidth 
-                        margin="normal" 
-                        label="File Name" 
-                        value={editDocData.fileName} 
-                        onChange={(e) => setEditDocData({ ...editDocData, fileName: e.target.value })}
-                    />
-                    <TextField 
-                        fullWidth 
-                        margin="normal" 
-                        label="Notes / Description" 
-                        multiline 
-                        rows={4} 
-                        value={editDocData.notes} 
-                        onChange={(e) => setEditDocData({ ...editDocData, notes: e.target.value })}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setEditDocModalOpen(false)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleEditDocSubmit}>Save Changes</Button>
-                </DialogActions>
-            </Dialog>
-
         </Container>
     );
 };

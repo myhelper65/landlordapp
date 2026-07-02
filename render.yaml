@@ -12,10 +12,18 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile
     envVars:
-      - key: DATABASE_URL
+      - key: DATABASE_HOST
         fromDatabase:
           name: property-db
-          property: connectionString
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: property-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: property-db
+          property: database
       - key: DATABASE_USER
         fromDatabase:
           name: property-db

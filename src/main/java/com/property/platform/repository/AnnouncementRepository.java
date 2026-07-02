@@ -28,7 +28,6 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, UUID
     
     // Tenant: Get published, active announcements with Pagination
     @Query("SELECT a FROM Announcement a WHERE a.community.id = :communityId " +
-           "AND (a.property.id = :propertyId OR a.property IS NULL) " +
            "AND a.status = 'PUBLISHED' " +
            "AND a.isDeleted = false " +
            "AND (a.publishDate IS NULL OR a.publishDate <= :now) " +
@@ -36,7 +35,6 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, UUID
            "ORDER BY CASE a.priority WHEN 'CRITICAL' THEN 1 WHEN 'HIGH' THEN 2 WHEN 'NORMAL' THEN 3 ELSE 4 END ASC, a.publishDate DESC")
     Page<Announcement> findActiveForTenant(
             @Param("communityId") UUID communityId, 
-            @Param("propertyId") UUID propertyId, 
             @Param("now") Instant now, 
             Pageable pageable);
 

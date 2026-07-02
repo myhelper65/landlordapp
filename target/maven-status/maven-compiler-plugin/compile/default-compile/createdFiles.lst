@@ -6,7 +6,6 @@ com\property\platform\dto\request\PropertyAssignmentRequestDTO$PropertyAssignmen
 com\property\platform\PlatformApplication.class
 com\property\platform\controller\PropertyController.class
 com\property\platform\controller\InvoiceController.class
-com\property\platform\config\OpenApiConfig.class
 com\property\platform\dto\request\MaintenanceRequestSummaryDTO.class
 com\property\platform\dto\response\DocumentResponseDTO.class
 com\property\platform\controller\UserController.class
@@ -83,7 +82,6 @@ com\property\platform\config\ApplicationConfig.class
 com\property\platform\controller\DashboardController.class
 com\property\platform\controller\CommunityController.class
 com\property\platform\entity\UserProperty$UserPropertyBuilder.class
-com\property\platform\controller\TenantController.class
 com\property\platform\dto\response\DocumentResponseDTO$DocumentResponseDTOBuilder.class
 com\property\platform\entity\enums\UserRole.class
 com\property\platform\entity\UserProperty$RelationshipType.class

@@ -180,15 +180,6 @@ public class InvoiceService {
                 .collect(Collectors.toList());
     }
 
-    public List<InvoiceResponseDTO> getMyInvoices() {
-        String email = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
-        User tenant = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
-        return invoiceRepository.findByUserIdAndIsDeletedFalse(tenant.getId())
-                .stream()
-                .map(this::mapToResponseDTO)
-                .collect(Collectors.toList());
-    }
-
     // 2. Faturayı güncelle (Edit formu için)
     public InvoiceResponseDTO updateInvoice(UUID invoiceId, InvoiceRequestDTO request) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
@@ -251,5 +242,12 @@ public class InvoiceService {
                 .notes(invoice.getNotes())
                 .description(descriptionStr)
                 .build();
+    }
+
+    public List<InvoiceResponseDTO> getInvoicesForTenant(String email) {
+        return invoiceRepository.findByUserEmailAndIsDeletedFalse(email)
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
 }

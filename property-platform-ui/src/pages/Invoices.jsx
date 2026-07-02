@@ -39,8 +39,8 @@ const Invoices = () => {
             const headers = { Authorization: `Bearer ${token}` };
 
             const [invoicesRes, propertiesRes] = await Promise.all([
-                axios.get('http://localhost:8080/api/v1/invoices', { headers }),
-                axios.get('http://localhost:8080/api/v1/properties', { headers })
+                axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/invoices`, { headers }),
+                axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/properties`, { headers })
             ]);
 
             setInvoices(invoicesRes.data);
@@ -114,9 +114,9 @@ const Invoices = () => {
             };
 
             if (formMode === 'add') {
-                await axios.post('http://localhost:8080/api/v1/invoices', payload, { headers });
+                await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/invoices`, payload, { headers });
             } else {
-                await axios.put(`http://localhost:8080/api/v1/invoices/${selectedInvoice.id}`, payload, { headers });
+                await axios.put(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/invoices/${selectedInvoice.id}`, payload, { headers });
             }
 
             setOpenForm(false);
@@ -143,7 +143,7 @@ const Invoices = () => {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:8080/api/v1/invoices/${selectedInvoice.id}`, {
+            await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/invoices/${selectedInvoice.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setOpenDelete(false);

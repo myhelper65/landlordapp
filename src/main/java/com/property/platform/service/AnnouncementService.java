@@ -113,9 +113,8 @@ public class AnnouncementService {
                 .stream().findFirst().orElseThrow(() -> new RuntimeException("No active property assigned"));
 
         UUID communityId = assignment.getProperty().getCommunity().getId();
-        UUID propertyId = assignment.getProperty().getId();
         
-        return announcementRepository.findActiveForTenant(communityId, propertyId, Instant.now(), pageable)
+        return announcementRepository.findActiveForTenant(communityId, Instant.now(), pageable)
                 .map(a -> {
                     boolean isRead = readReceiptRepository.existsByAnnouncementIdAndUserId(a.getId(), tenant.getId());
                     return mapToDTO(a, isRead);

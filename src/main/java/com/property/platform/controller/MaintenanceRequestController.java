@@ -103,9 +103,9 @@ public class MaintenanceRequestController {
     @PutMapping("/api/v1/admin/repair-requests/{id}/status")
     public ResponseEntity<Map<String, Object>> updateStatus(
             @PathVariable UUID id,
-            @RequestBody Map<String, String> payload) {
+            @RequestBody Map<String, Object> payload) {
 
-        Map<String, Object> response = maintenanceService.updateStatus(id, payload.get("status"));
+        Map<String, Object> response = maintenanceService.updateStatus(id, payload);
         return ResponseEntity.ok(response);
     }
 

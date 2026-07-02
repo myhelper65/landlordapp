@@ -3,6 +3,7 @@ package com.property.platform.repository;
 import com.property.platform.entity.Invoice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -35,5 +36,5 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
 
         Optional<Invoice> findByIdAndUserIdAndIsDeletedFalse(UUID invoiceId, UUID userId);
 
-
-    }
+    List<Invoice> findByUserEmailAndIsDeletedFalse(String email);
+}

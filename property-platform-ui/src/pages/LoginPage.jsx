@@ -30,7 +30,7 @@ const LoginPage = () => {
 
         try {
             // Backend auth endpoint'ine istek atıyoruz
-            const response = await axios.post('http://localhost:8080/api/v1/auth/login', credentials);
+            const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/auth/login`, credentials);
 
             const { token, role, email } = response.data;
 

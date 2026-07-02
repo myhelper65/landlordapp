@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import api from '../api/axiosInstance';
+import { announcementAPI } from './announcementService';
+import dayjs from 'dayjs';
 import {
     Box, Typography, Grid, Card, CardContent, Avatar,
     Divider, Chip, IconButton, CircularProgress
@@ -15,18 +18,28 @@ const AdminDashboard = () => {
     const userName = storedUser.email ? storedUser.email.split('@')[0] : 'Admin';
 
     const [stats, setStats] = useState(null);
+    const [announcements, setAnnouncements] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchDashboardStats = async () => {
+        const fetchDashboardData = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await axios.get('http://localhost:8080/api/v1/dashboard/summary', {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/dashboard/summary`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setStats(response.data);
+
+                // Fetch recent announcements
+                const commRes = await api.get('/communities');
+                const communitiesList = commRes.data.content || commRes.data;
+                if (communitiesList.length > 0) {
+                    const firstCommunityId = communitiesList[0].id;
+                    const annRes = await announcementAPI.getAdminAnnouncements(firstCommunityId, { page: 0, size: 4, sort: 'publishDate,desc' });
+                    setAnnouncements(annRes.data.content || []);
+                }
             } catch (error) {
                 console.error("Dashboard verileri çekilirken hata:", error);
             } finally {
@@ -34,7 +47,7 @@ const AdminDashboard = () => {
             }
         };
 
-        fetchDashboardStats();
+        fetchDashboardData();
     }, []);
 
     // Tenant panelindeki yüksek kontrastlı ve ferah renk paleti
@@ -90,14 +103,14 @@ const AdminDashboard = () => {
                 </Box>
             </Box>
 
-            <Grid container spacing={3}>
+            <Grid container spacing={3} className="animate-fade-in">
                 {/* SOL TARAF: İSTATİSTİKLER VE HIZLI İŞLEMLER (8 Sütun) */}
                 <Grid item xs={12} md={8}>
 
                     {/* 1. SATIR: İSTATİSTİK KARTLARI (Tenant tarzı yuvarlak hatlı ve avatarlı) */}
                     <Grid container spacing={2} sx={{ mb: 4 }}>
                         <Grid item xs={12} sm={6} md={3}>
-                            <Card sx={{ borderRadius: 3, border: `1px solid ${theme.borderLight}`, boxShadow: 'none', height: '100%' }}>
+                            <Card className="hover-lift" sx={{ borderRadius: 3, border: `1px solid ${theme.borderLight}`, boxShadow: 'var(--shadow-soft)', height: '100%' }}>
                                 <CardContent>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <Box>
@@ -163,14 +176,15 @@ const AdminDashboard = () => {
                         {quickActions.map((action, index) => (
                             <Grid item xs={6} sm={3} key={index}>
                                 <Card
+                                    className="hover-lift"
                                     onClick={() => {
                                         if (action.path) navigate(action.path);
                                         else alert(`${action.label} modülü yakında eklenecek!`);
                                     }}
                                     sx={{
                                         borderRadius: 3, textAlign: 'center', cursor: 'pointer',
-                                        boxShadow: 'none', border: `1px solid ${theme.borderLight}`,
-                                        '&:hover': { bgcolor: '#f3f4f6' }
+                                        boxShadow: 'var(--shadow-soft)', border: `1px solid ${theme.borderLight}`,
+                                        '&:hover': { bgcolor: '#f8fafc' }
                                     }}
                                 >
                                     <CardContent>
@@ -186,7 +200,7 @@ const AdminDashboard = () => {
 
                     {/* 3. SATIR: BAKIM DURUMU (Community Maintenance Status) */}
                     <Typography variant="h6" sx={{ fontWeight: 800, mb: 2, color: theme.textDark }}>Community Maintenance Status</Typography>
-                    <Card sx={{ borderRadius: 3, boxShadow: 'none', border: `1px solid ${theme.borderLight}` }}>
+                    <Card className="hover-lift" sx={{ borderRadius: 3, boxShadow: 'var(--shadow-soft)', border: `1px solid ${theme.borderLight}` }}>
                         <CardContent sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', alignItems: 'center' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <Chip label="New" size="small" sx={{ bgcolor: theme.greenBg, color: theme.greenText, fontWeight: 700 }} />
@@ -207,41 +221,47 @@ const AdminDashboard = () => {
 
                 {/* SAĞ TARAF: DUYURULAR (4 Sütun) */}
                 <Grid item xs={12} md={4}>
-                    <Card sx={{ borderRadius: 3, boxShadow: 'none', border: `1px solid ${theme.borderLight}`, height: '100%' }}>
+                    <Card className="hover-lift" sx={{ borderRadius: 3, boxShadow: 'var(--shadow-soft)', border: `1px solid ${theme.borderLight}`, height: '100%' }}>
                         <CardContent>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                                 <Campaign sx={{ color: theme.primary, mr: 1 }} />
                                 <Typography variant="h6" sx={{ fontWeight: 800, color: theme.textDark }}>Recent Announcements</Typography>
                             </Box>
 
-                            <Box sx={{ mb: 3 }}>
-                                <Chip label="Important" size="small" sx={{ bgcolor: theme.redBg, color: theme.redText, fontWeight: 600, mb: 1 }} />
-                                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Parking Lot Resurfacing</Typography>
-                                <Typography variant="body2" sx={{ color: theme.textGrey, mt: 0.5 }}>
-                                    Building B parking lot will be resurfaced June 20-22. All residents please park in the guest lot.
+                            {announcements.length === 0 ? (
+                                <Typography variant="body2" sx={{ color: theme.textGrey, fontStyle: 'italic' }}>
+                                    No recent announcements.
                                 </Typography>
-                                <Typography variant="caption" sx={{ color: theme.primary, display: 'block', mt: 1, fontWeight: 600 }}>Jun 10</Typography>
-                            </Box>
-                            <Divider sx={{ my: 2 }} />
+                            ) : (
+                                announcements.map((ann, index) => {
+                                    let chipColor = theme.primary;
+                                    let chipBg = theme.bgMain;
+                                    
+                                    if (ann.category === 'URGENT' || ann.category === 'IMPORTANT') { 
+                                        chipColor = theme.redText; chipBg = theme.redBg; 
+                                    } else if (ann.category === 'NOTICE') { 
+                                        chipColor = theme.orangeText; chipBg = theme.orangeBg; 
+                                    } else { 
+                                        chipColor = theme.greenText; chipBg = theme.greenBg; 
+                                    }
 
-                            <Box sx={{ mb: 3 }}>
-                                <Chip label="Notice" size="small" sx={{ bgcolor: theme.orangeBg, color: theme.orangeText, fontWeight: 600, mb: 1 }} />
-                                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Pool Maintenance</Typography>
-                                <Typography variant="body2" sx={{ color: theme.textGrey, mt: 0.5 }}>
-                                    The community pool will be closed June 15-17 for annual deep cleaning and tile repair.
-                                </Typography>
-                                <Typography variant="caption" sx={{ color: theme.primary, display: 'block', mt: 1, fontWeight: 600 }}>Jun 9</Typography>
-                            </Box>
-                            <Divider sx={{ my: 2 }} />
-
-                            <Box>
-                                <Chip label="Update" size="small" sx={{ bgcolor: theme.greenBg, color: theme.greenText, fontWeight: 600, mb: 1 }} />
-                                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>New Fitness Center Hours</Typography>
-                                <Typography variant="body2" sx={{ color: theme.textGrey, mt: 0.5 }}>
-                                    Starting July 1, the fitness center will be open 5 AM to 11 PM daily.
-                                </Typography>
-                                <Typography variant="caption" sx={{ color: theme.primary, display: 'block', mt: 1, fontWeight: 600 }}>Jun 8</Typography>
-                            </Box>
+                                    return (
+                                        <Box key={ann.id || index}>
+                                            <Box sx={{ mb: 2 }}>
+                                                <Chip label={ann.category || 'GENERAL'} size="small" sx={{ bgcolor: chipBg, color: chipColor, fontWeight: 600, mb: 1 }} />
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{ann.title}</Typography>
+                                                <Typography variant="body2" sx={{ color: theme.textGrey, mt: 0.5 }}>
+                                                    {ann.content}
+                                                </Typography>
+                                                <Typography variant="caption" sx={{ color: theme.primary, display: 'block', mt: 1, fontWeight: 600 }}>
+                                                    {ann.publishDate ? dayjs(ann.publishDate).format('MMM D, YYYY') : dayjs(ann.createdAt).format('MMM D, YYYY')}
+                                                </Typography>
+                                            </Box>
+                                            {index < announcements.length - 1 && <Divider sx={{ my: 2 }} />}
+                                        </Box>
+                                    );
+                                })
+                            )}
 
                         </CardContent>
                     </Card>
