@@ -41,28 +41,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
         
-        // 2. Token'ı al ve içindeki emaili çöz
-        jwt = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwt);
-        
-        // 3. Kullanıcı emaili varsa ve henüz sisteme giriş yapmamışsa (Context boşsa)
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        try {
+            // 2. Token'ı al ve içindeki emaili çöz
+            jwt = authHeader.substring(7);
+            userEmail = jwtService.extractUsername(jwt);
             
-            // Veritabanından kullanıcıyı bul
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            
-            // Token süresi dolmamış mı, o kullanıcıya mı ait kontrol et
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            // 3. Kullanıcı emaili varsa ve henüz sisteme giriş yapmamışsa (Context boşsa)
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 
-                // Güvenlik kapısını aç ve kullanıcıyı sisteme (SecurityContext) yerleştir
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                // Veritabanından kullanıcıyı bul
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                
+                // Token süresi dolmamış mı, o kullanıcıya mı ait kontrol et
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    
+                    // Güvenlik kapısını aç ve kullanıcıyı sisteme (SecurityContext) yerleştir
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            // Token expired or invalid, simply ignore and let the request continue without authentication
+            System.out.println("JWT Parsing Error: " + e.getMessage());
         }
         
         // İsteği ait olduğu asıl Controller'a gönder
