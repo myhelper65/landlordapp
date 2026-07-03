@@ -1,5 +1,6 @@
 com\property\platform\entity\MaintenanceRequest$RequestPriority.class
 com\property\platform\entity\PropertyDocument.class
+com\property\platform\dto\response\PaymentResponse.class
 com\property\platform\service\AnnouncementService.class
 com\property\platform\dto\request\PropertyAssignmentRequestDTO$PropertyAssignmentRequestDTOBuilder.class
 com\property\platform\PlatformApplication.class
@@ -15,6 +16,7 @@ com\property\platform\dto\response\MaintenanceResponseDTO.class
 com\property\platform\entity\MaintenanceRequest$RequestStatus.class
 com\property\platform\dto\response\DashboardSummaryDTO.class
 com\property\platform\dto\request\AnnouncementRequestDTO$AnnouncementRequestDTOBuilder.class
+com\property\platform\config\BootstrapAdminInitializer.class
 com\property\platform\dto\response\CommunityResponseDTO$CommunityResponseDTOBuilder.class
 com\property\platform\entity\User$UserRole.class
 com\property\platform\entity\Announcement$AnnouncementCategory.class
@@ -94,6 +96,7 @@ com\property\platform\dto\request\PropertyAssignmentRequestDTO.class
 com\property\platform\entity\RepairRequest.class
 com\property\platform\repository\UserRepository.class
 com\property\platform\dto\request\LoginRequestDTO$LoginRequestDTOBuilder.class
+com\property\platform\dto\response\PaymentResponse$PaymentResponseBuilder.class
 com\property\platform\entity\AnnouncementReadReceipt.class
 com\property\platform\repository\AnnouncementReadReceiptRepository.class
 com\property\platform\repository\AnnouncementRepository.class
@@ -110,6 +113,7 @@ com\property\platform\controller\ReportController.class
 com\property\platform\dto\request\MaintenanceRequestSummaryDTO$MaintenanceRequestSummaryDTOBuilder.class
 com\property\platform\exceptions\PaymentProcessingException.class
 com\property\platform\config\SecurityConfig.class
+com\property\platform\controller\ReceiptController.class
 com\property\platform\entity\Invoice$InvoiceBuilder.class
 com\property\platform\repository\MaintenanceRequestRepository.class
 com\property\platform\controller\MaintenanceRequestController.class

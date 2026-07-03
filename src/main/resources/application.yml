@@ -31,4 +31,4 @@ jwt:
   secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
 
 cors:
-  allowed-origins: http://localhost:5173,http://localhost:5177
+  allowed-origins: http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177
