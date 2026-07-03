@@ -1,11 +1,11 @@
 com\property\platform\entity\MaintenanceRequest$RequestPriority.class
 com\property\platform\entity\PropertyDocument.class
-com\property\platform\dto\response\PaymentResponse.class
 com\property\platform\service\AnnouncementService.class
 com\property\platform\dto\request\PropertyAssignmentRequestDTO$PropertyAssignmentRequestDTOBuilder.class
 com\property\platform\PlatformApplication.class
 com\property\platform\controller\PropertyController.class
 com\property\platform\controller\InvoiceController.class
+com\property\platform\config\OpenApiConfig.class
 com\property\platform\dto\request\MaintenanceRequestSummaryDTO.class
 com\property\platform\dto\response\DocumentResponseDTO.class
 com\property\platform\controller\UserController.class
@@ -46,8 +46,10 @@ com\property\platform\dto\response\DashboardSummaryDTO$DashboardSummaryDTOBuilde
 com\property\platform\repository\PropertyDocumentRepository.class
 com\property\platform\repository\PaymentMethodRepository.class
 com\property\platform\entity\Payment$PaymentBuilder.class
+com\property\platform\dto\request\InviteTenantRequest.class
 com\property\platform\dto\response\MaintenanceResponseDTO$MaintenanceResponseDTOBuilder.class
 com\property\platform\dto\request\PaymentRequest.class
+com\property\platform\controller\ProfileController.class
 com\property\platform\service\PropertyService.class
 com\property\platform\repository\RepairRequestRepository.class
 com\property\platform\dto\request\LoginRequestDTO.class
@@ -75,6 +77,7 @@ com\property\platform\exceptions\GlobalExceptionHandler.class
 com\property\platform\dto\request\CommunityRequestDTO$CommunityRequestDTOBuilder.class
 com\property\platform\integration\PaymentGatewayClient.class
 com\property\platform\dto\request\PropertyRequestDTO$PropertyRequestDTOBuilder.class
+com\property\platform\service\ProfileService.class
 com\property\platform\dto\request\InvoiceRequestDTO$InvoiceRequestDTOBuilder.class
 com\property\platform\dto\response\AuthResponseDTO$AuthResponseDTOBuilder.class
 com\property\platform\repository\DocumentRepository.class
@@ -82,6 +85,8 @@ com\property\platform\config\ApplicationConfig.class
 com\property\platform\controller\DashboardController.class
 com\property\platform\controller\CommunityController.class
 com\property\platform\entity\UserProperty$UserPropertyBuilder.class
+com\property\platform\controller\TenantController.class
+com\property\platform\config\DataSeeder.class
 com\property\platform\dto\response\DocumentResponseDTO$DocumentResponseDTOBuilder.class
 com\property\platform\entity\enums\UserRole.class
 com\property\platform\entity\UserProperty$RelationshipType.class
@@ -89,7 +94,6 @@ com\property\platform\dto\request\PropertyAssignmentRequestDTO.class
 com\property\platform\entity\RepairRequest.class
 com\property\platform\repository\UserRepository.class
 com\property\platform\dto\request\LoginRequestDTO$LoginRequestDTOBuilder.class
-com\property\platform\dto\response\PaymentResponse$PaymentResponseBuilder.class
 com\property\platform\entity\AnnouncementReadReceipt.class
 com\property\platform\repository\AnnouncementReadReceiptRepository.class
 com\property\platform\repository\AnnouncementRepository.class
@@ -106,13 +110,15 @@ com\property\platform\controller\ReportController.class
 com\property\platform\dto\request\MaintenanceRequestSummaryDTO$MaintenanceRequestSummaryDTOBuilder.class
 com\property\platform\exceptions\PaymentProcessingException.class
 com\property\platform\config\SecurityConfig.class
-com\property\platform\controller\ReceiptController.class
 com\property\platform\entity\Invoice$InvoiceBuilder.class
 com\property\platform\repository\MaintenanceRequestRepository.class
 com\property\platform\controller\MaintenanceRequestController.class
+com\property\platform\config\StartupAdminInitializer.class
+com\property\platform\dto\request\DocumentRequestDTO.class
 com\property\platform\entity\Community.class
 com\property\platform\controller\AnnouncementController.class
 com\property\platform\entity\Announcement$AnnouncementBuilder.class
+com\property\platform\dto\request\FirstSetupRequestDTO.class
 com\property\platform\dto\response\AuthResponseDTO.class
 com\property\platform\entity\Invoice.class
 com\property\platform\dto\response\PropertyResponseDTO.class
@@ -123,6 +129,7 @@ com\property\platform\controller\UserPropertyController.class
 com\property\platform\dto\response\CommunityResponseDTO.class
 com\property\platform\entity\Property$PropertyType.class
 com\property\platform\dto\request\CommunityRequestDTO.class
+com\property\platform\dto\request\GoogleLoginRequest.class
 com\property\platform\entity\Document$DocumentBuilder.class
 com\property\platform\entity\Announcement$AnnouncementPriority.class
 com\property\platform\dto\response\DocumentDTO.class

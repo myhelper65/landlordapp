@@ -30,7 +30,7 @@ public class BootstrapAdminInitializer implements CommandLineRunner {
                     .firstName("Bootstrap")
                     .lastName("Administrator")
                     .role(User.UserRole.SUPER_ADMIN)
-                    .status(User.UserStatus.ACTIVE)
+                    .enabled(true)
                     .emailVerified(true)
                     .firstLoginRequired(true)
                     .build();
