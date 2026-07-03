@@ -11,9 +11,9 @@ import { Edit, Delete, PersonAdd, Visibility, CloudUpload, InsertDriveFile, Pict
 
 // Mevcut API Servislerin
 import { getAllProperties, createProperty, deleteProperty, updateProperty } from '../api/propertyService';
-import { getAllUsers } from '../api/userService';
-import { assignUserToProperty } from '../api/userPropertyService';
 import { getAllCommunities } from '../api/communityService';
+import { assignUserToProperty, inviteTenant } from '../api/userPropertyService';
+import { uploadPropertyDocument, getPropertyDocuments, deletePropertyDocument, getPropertyDetailsWithDocuments } from '../api/propertyDocumentService';
 
 const PropertiesPage = () => {
     const [properties, setProperties] = useState([]);
@@ -22,8 +22,11 @@ const PropertiesPage = () => {
     const [loading, setLoading] = useState(true);
 
     // Form State'leri
-    const [rentModalOpen, setRentModalOpen] = useState(false);
-    const [rentData, setRentData] = useState({ userId: '', propertyId: '', type: 'TENANT' });
+    const [inviteModalOpen, setInviteModalOpen] = useState(false);
+    const [inviteData, setInviteData] = useState({ 
+        propertyId: '', firstName: '', lastName: '', email: '', phone: '',
+        leaseStartDate: '', leaseEndDate: '', monthlyRent: '', securityDeposit: ''
+    });
 
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [newProperty, setNewProperty] = useState({ communityId: '', unitNumber: '', propertyType: 'SINGLE_FAMILY' });
@@ -44,9 +47,6 @@ const PropertiesPage = () => {
         try {
             const propData = await getAllProperties();
             setProperties(propData?.content || propData || []);
-
-            const userData = await getAllUsers();
-            setUsers(userData?.content || userData || []);
 
             const commData = await getAllCommunities();
             setCommunities(commData?.content || commData || []);
@@ -91,19 +91,22 @@ const PropertiesPage = () => {
         }
     };
 
-    const openRentModal = (propertyId) => {
-        setRentData({ userId: '', propertyId: propertyId, type: 'TENANT' });
-        setRentModalOpen(true);
+    const openInviteModal = (propertyId) => {
+        setInviteData({ 
+            propertyId, firstName: '', lastName: '', email: '', phone: '',
+            leaseStartDate: '', leaseEndDate: '', monthlyRent: '', securityDeposit: ''
+        });
+        setInviteModalOpen(true);
     };
 
-    const handleRentSubmit = async () => {
+    const handleInviteSubmit = async () => {
         try {
-            await assignUserToProperty(rentData);
-            alert("Action successfully!");
-            setRentModalOpen(false);
+            await inviteTenant(inviteData);
+            alert("Tenant invited successfully! An email has been sent.");
+            setInviteModalOpen(false);
             fetchData();
         } catch (error) {
-            alert(error.response?.data?.message || "Failed action.");
+            alert(error.response?.data?.message || "Failed to invite tenant.");
         }
     };
 
@@ -121,12 +124,8 @@ const PropertiesPage = () => {
     // --- YENİ: MÜLK DETAYLARI VE DOSYA YÜKLEME ---
     const openDetailsModal = async (id) => {
         try {
-            const token = localStorage.getItem('token');
-            // Yeni yazdığımız detay endpointine istek atıyoruz
-            const response = await axios.get(`${API_BASE_URL}/api/v1/properties/${id}/details`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setPropertyDetails(response.data);
+            const data = await getPropertyDetailsWithDocuments(id);
+            setPropertyDetails(data);
             setSelectedFiles([]);
             setDetailsModalOpen(true);
         } catch (error) {
@@ -162,17 +161,8 @@ const PropertiesPage = () => {
         setUploadingFiles(true);
 
         try {
-            const token = localStorage.getItem('token');
             for (let file of selectedFiles) {
-                const formData = new FormData();
-                formData.append("file", file);
-
-                await axios.post(`${API_BASE_URL}/api/v1/properties/${propertyDetails.id}/documents`, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                        Authorization: `Bearer ${token}`
-                    }
-                });
+                await uploadPropertyDocument(propertyDetails.id, file);
             }
             alert("Documents are uploaded!");
             setSelectedFiles([]);
@@ -221,6 +211,8 @@ const PropertiesPage = () => {
                             <TableCell sx={{ fontWeight: 'bold' }}>Community Name</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Unit Number</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Type</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Tenant Name</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Tenant Email</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
                             <TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>Actions</TableCell>
                         </TableRow>
@@ -231,6 +223,8 @@ const PropertiesPage = () => {
                                 <TableCell>{p.communityName || 'N/A'}</TableCell>
                                 <TableCell>{p.unitNumber}</TableCell>
                                 <TableCell>{p.propertyType || p.type}</TableCell>
+                                <TableCell>{p.tenantName || '-'}</TableCell>
+                                <TableCell>{p.tenantEmail || '-'}</TableCell>
                                 <TableCell>
                                     <Chip
                                         label={p.status}
@@ -244,8 +238,8 @@ const PropertiesPage = () => {
                                         <Visibility fontSize="small" />
                                     </IconButton>
 
-                                    <IconButton color="success" onClick={() => openRentModal(p.id)} title="Rent to Tenant">
-                                        <PersonAdd fontSize="small" />
+                                    <IconButton color="success" onClick={() => openInviteModal(p.id)} title="Invite Tenant">
+                                        <PersonAdd />
                                     </IconButton>
                                     <IconButton color="primary" title="Edit" onClick={() => openEditModal(p)}>
                                         <Edit fontSize="small" />
@@ -399,24 +393,42 @@ const PropertiesPage = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* RENT MODAL */}
-            <Dialog open={rentModalOpen} onClose={() => setRentModalOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle>Rent Property to Tenant</DialogTitle>
+            {/* INVITE TENANT MODAL */}
+            <Dialog open={inviteModalOpen} onClose={() => setInviteModalOpen(false)} fullWidth maxWidth="sm">
+                <DialogTitle>Invite Tenant</DialogTitle>
                 <DialogContent>
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel>Select Tenant</InputLabel>
-                        <Select value={rentData.userId} label="Select Tenant" onChange={(e) => setRentData({ ...rentData, userId: e.target.value })}>
-                            {users.map((user) => (
-                                <MenuItem key={user.id} value={user.id}>
-                                    {user.firstName} {user.lastName} ({user.email})
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    <Grid container spacing={2} sx={{ mt: 1 }}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField fullWidth label="First Name" value={inviteData.firstName} onChange={(e) => setInviteData({ ...inviteData, firstName: e.target.value })}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField fullWidth label="Last Name" value={inviteData.lastName} onChange={(e) => setInviteData({ ...inviteData, lastName: e.target.value })}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField fullWidth label="Email" type="email" value={inviteData.email} onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField fullWidth label="Phone" value={inviteData.phone} onChange={(e) => setInviteData({ ...inviteData, phone: e.target.value })}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>Lease Start</Typography>
+                            <TextField fullWidth type="date" value={inviteData.leaseStartDate} onChange={(e) => setInviteData({ ...inviteData, leaseStartDate: e.target.value })}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', mb: 0.5, display: 'block' }}>Lease End</Typography>
+                            <TextField fullWidth type="date" value={inviteData.leaseEndDate} onChange={(e) => setInviteData({ ...inviteData, leaseEndDate: e.target.value })}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField fullWidth label="Monthly Rent" type="number" value={inviteData.monthlyRent} onChange={(e) => setInviteData({ ...inviteData, monthlyRent: e.target.value })}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField fullWidth label="Security Deposit" type="number" value={inviteData.securityDeposit} onChange={(e) => setInviteData({ ...inviteData, securityDeposit: e.target.value })}/>
+                        </Grid>
+                    </Grid>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setRentModalOpen(false)}>Cancel</Button>
-                    <Button variant="contained" color="success" onClick={handleRentSubmit}>Confirm Rent</Button>
+                    <Button onClick={() => setInviteModalOpen(false)}>Cancel</Button>
+                    <Button variant="contained" color="success" onClick={handleInviteSubmit}>Send Invitation</Button>
                 </DialogActions>
             </Dialog>
         </Container>

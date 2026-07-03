@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
     Box, Typography, TextField, Button, Paper, InputAdornment,
-    IconButton, Alert, CircularProgress, Grid, Divider
+    IconButton, Alert, CircularProgress, Grid, Divider, Link
 } from '@mui/material';
 import { Visibility, VisibilityOff, EmailOutlined, LockOutlined, MapsHomeWork } from '@mui/icons-material';
 
@@ -32,15 +32,20 @@ const LoginPage = () => {
             // Backend auth endpoint'ine istek atıyoruz
             const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/auth/login`, credentials);
 
-            const { token, role, email } = response.data;
+            const { token, role, email, firstLoginRequired } = response.data;
 
             // Gelen verileri LocalStorage'a kaydediyoruz
             localStorage.setItem('token', token);
             localStorage.setItem('role', role);
             localStorage.setItem('email', email);
+            localStorage.setItem('firstLoginRequired', firstLoginRequired);
 
-            // Giriş başarılı, App.js'deki DashboardRouter onu doğru panele yönlendirecek
-            navigate('/dashboard');
+            // İlk giriş zorunlu kurulumu kontrolü
+            if (firstLoginRequired) {
+                navigate('/admin-setup');
+            } else {
+                navigate('/dashboard');
+            }
 
         } catch (err) {
             console.error("Login error:", err);
@@ -144,11 +149,11 @@ const LoginPage = () => {
                             }}
                         />
 
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4 }}>
-                            <Typography variant="body2" sx={{ color: theme.primary, fontWeight: 600, cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>
-                                Forgot password?
-                            </Typography>
-                        </Box>
+                            <Box display="flex" justifyContent="flex-end" mb={3}>
+                                <Link component="button" type="button" variant="body2" fontWeight="bold" onClick={() => navigate('/forgot-password')}>
+                                    Forgot password?
+                                </Link>
+                            </Box>
 
                         <Button
                             type="submit"

@@ -16,6 +16,10 @@ import RepairRequests from './pages/RepairRequests';
 import { AdminAnnouncements } from './pages/AdminAnnouncements';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import AdminSetupWizard from './pages/AdminSetupWizard';
+import TenantActivation from './pages/TenantActivation';
 
 // --- AKILLI YÖNLENDİRİCİ (SMART ROUTER) ---
 const DashboardRouter = () => {
@@ -50,8 +54,11 @@ function App() {
             }} />
 
             <Routes>
-                {/* Herkese Açık Rota */}
+                {/* Herkese Açık Rotalar */}
                 <Route path="/login" element={<LoginPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/activate/:token" element={<TenantActivation />} />
 
                 {/* Korumalı Rota ve Layout */}
                 <Route
@@ -64,6 +71,7 @@ function App() {
                 >
                     <Route index element={<Navigate to="/dashboard" replace />} />
                     <Route path="dashboard" element={<DashboardRouter />} />
+                    <Route path="admin-setup" element={<AdminSetupWizard />} />
 
                     {/* --- ADMIN ROTALARI --- */}
                     <Route path="properties" element={<PropertiesPage />} />

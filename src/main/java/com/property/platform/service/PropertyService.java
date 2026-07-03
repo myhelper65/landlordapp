@@ -70,7 +70,12 @@ public class PropertyService {
         // Sadece silinmemiş olanları (isDeleted = false) getir
         return propertyRepository.findByIsDeletedFalse()
                 .stream()
-                .map(property -> PropertyResponseDTO.builder()
+                .map(property -> {
+                    var activeUserProp = userPropertyRepository.findByPropertyIdAndIsDeletedFalse(property.getId()).stream().findFirst().orElse(null);
+                    String tName = activeUserProp != null ? activeUserProp.getUser().getFirstName() + " " + activeUserProp.getUser().getLastName() : null;
+                    String tEmail = activeUserProp != null ? activeUserProp.getUser().getEmail() : null;
+
+                    return PropertyResponseDTO.builder()
                         .id(property.getId())
                         .communityId(property.getCommunity().getId())
                         .communityName(property.getCommunity().getName())
@@ -78,7 +83,10 @@ public class PropertyService {
                         .propertyType(property.getPropertyType())
                         .status(property.getStatus())
                         .notes(property.getNotes())
-                        .build())
+                        .tenantName(tName)
+                        .tenantEmail(tEmail)
+                        .build();
+                })
                 .collect(Collectors.toList());
     }
 
@@ -94,6 +102,12 @@ public class PropertyService {
 
         // 3. Veritabanında güncelle
         propertyRepository.save(property);
+        
+        // 4. Mülke bağlı olan aktif kiracı ilişkilerini de (Lease) soft delete yap
+        userPropertyRepository.findByPropertyIdAndIsDeletedFalse(id).forEach(lease -> {
+            lease.setDeleted(true);
+            userPropertyRepository.save(lease);
+        });
     }
 
 
@@ -198,11 +212,10 @@ public class PropertyService {
         Property property = propertyRepository.findByIdAndIsDeletedFalse(propertyId)
                 .orElseThrow(() -> new RuntimeException("No property found!!!"));
 
-        // Aktif kiracının adını bul
-        String tenantName = userPropertyRepository.findByPropertyIdAndIsDeletedFalse(propertyId).stream()
-                .map(up -> up.getUser().getFirstName() + " " + up.getUser().getLastName())
-                .findFirst()
-                .orElse("No Active Tenant");
+        // Aktif kiracının adını ve mailini bul
+        var activeUserProp = userPropertyRepository.findByPropertyIdAndIsDeletedFalse(propertyId).stream().findFirst().orElse(null);
+        String tenantName = activeUserProp != null ? activeUserProp.getUser().getFirstName() + " " + activeUserProp.getUser().getLastName() : "No Active Tenant";
+        String tenantEmail = activeUserProp != null ? activeUserProp.getUser().getEmail() : null;
 
         // Yüklenmiş belgeleri çek
         List<com.property.platform.dto.response.DocumentDTO> docs = documentRepository.findByPropertyIdAndIsDeletedFalse(propertyId).stream()
@@ -223,6 +236,7 @@ public class PropertyService {
                 .status(property.getStatus())
                 .notes(property.getNotes())
                 .tenantName(tenantName)
+                .tenantEmail(tenantEmail)
                 .documents(docs)
                 .build();
     }

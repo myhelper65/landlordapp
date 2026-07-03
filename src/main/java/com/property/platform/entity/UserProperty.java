@@ -24,6 +24,18 @@ public class UserProperty extends BaseEntity {
     @Column(nullable = false)
     private RelationshipType type;
 
+    @Column(name = "lease_start_date")
+    private java.time.LocalDate leaseStartDate;
+
+    @Column(name = "lease_end_date")
+    private java.time.LocalDate leaseEndDate;
+
+    @Column(name = "monthly_rent")
+    private java.math.BigDecimal monthlyRent;
+
+    @Column(name = "security_deposit")
+    private java.math.BigDecimal securityDeposit;
+
     // RelationshipType ENUM'ı burada tanımlı!
     public enum RelationshipType {
         OWNER, TENANT, PROPERTY_MANAGER, MAINTENANCE_TECH

@@ -32,6 +32,37 @@ public class PaymentMethodController {
         return ResponseEntity.ok(paymentMethodRepository.findAllByUserIdAndIsDeletedFalse(tenant.getId()));
     }
 
+    @PostMapping
+    public ResponseEntity<PaymentMethod> addPaymentMethod(@RequestBody com.property.platform.dto.request.PaymentMethodRequestDTO request) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User tenant = userRepository.findByEmail(email).orElseThrow();
+
+        // MOCK: Generate fake token and extract last4
+        String last4 = request.getCardNumber() != null && request.getCardNumber().length() >= 4 
+                ? request.getCardNumber().substring(request.getCardNumber().length() - 4) 
+                : "0000";
+        
+        // Mock simple brand detection
+        String brand = "Visa";
+        if (request.getCardNumber() != null && request.getCardNumber().startsWith("5")) {
+            brand = "Mastercard";
+        } else if (request.getCardNumber() != null && request.getCardNumber().startsWith("3")) {
+            brand = "Amex";
+        }
+
+        PaymentMethod newMethod = PaymentMethod.builder()
+                .user(tenant)
+                .gatewayToken("mock_tok_" + java.util.UUID.randomUUID().toString().substring(0, 8))
+                .type(request.getType() != null ? request.getType() : "CARD")
+                .brand(brand)
+                .last4(last4)
+                .isDefault(false)
+                .build();
+        newMethod.setId(java.util.UUID.randomUUID());
+
+        return ResponseEntity.ok(paymentMethodRepository.save(newMethod));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePaymentMethod(@PathVariable UUID id) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

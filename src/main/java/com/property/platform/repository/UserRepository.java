@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
     long countByIsDeletedFalse();
     Optional<User> findByEmail(String email);
+    long countByRoleAndIsDeletedFalse(User.UserRole role);
 }

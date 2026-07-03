@@ -24,6 +24,22 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "password_hash", nullable = false)
     private String password;
 
+    @Column(length = 20)
+    private String phone;
+
+    @Builder.Default
+    @Column(name = "first_login_required")
+    private boolean firstLoginRequired = false;
+
+    @Builder.Default
+    @Column(name = "email_verified")
+    private boolean emailVerified = false;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(length = 20)
+    private UserStatus status = UserStatus.ACTIVE;
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
@@ -63,5 +79,9 @@ public class User extends BaseEntity implements UserDetails {
         SUPER_ADMIN, PROPERTY_MANAGER, LEASING_AGENT,
         ACCOUNTANT, PROPERTY_OWNER, TENANT,
         MAINTENANCE_TECH, VENDOR
+    }
+
+    public enum UserStatus {
+        ACTIVE, INVITED, LOCKED, INACTIVE
     }
 }

@@ -16,18 +16,7 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Create Admin
-        if (userRepository.findByEmail("admin@property.com").isEmpty()) {
-            User admin = User.builder()
-                    .email("admin@property.com")
-                    .password(passwordEncoder.encode("admin123"))
-                    .firstName("Super")
-                    .lastName("Admin")
-                    .role(User.UserRole.SUPER_ADMIN)
-                    .build();
-            userRepository.save(admin);
-            System.out.println("✅ Default admin user created: admin@property.com / admin123");
-        }
+        // SUPER_ADMIN creation has been moved to BootstrapAdminInitializer
 
         // Create Tenant
         if (userRepository.findByEmail("tenant@property.com").isEmpty()) {

@@ -8,3 +8,12 @@ export const assignUserToProperty = async (assignmentData) => {
     return response.data;
 };
 
+export const removeUserFromProperty = async (assignmentId) => {
+    const response = await axiosInstance.delete(`/user-properties/${assignmentId}`);
+    return response.data;
+};
+
+export const inviteTenant = async (inviteData) => {
+    const response = await axiosInstance.post(`/tenant/invite`, inviteData);
+    return response.data;
+};
