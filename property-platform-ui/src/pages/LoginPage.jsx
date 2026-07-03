@@ -31,7 +31,7 @@ const LoginPage = () => {
         setError('');
 
         try {
-            const response = await login(credentials);
+            const response = await login(credentials.email, credentials.password);
 
             if (response.token) {
                 if (response.firstLoginRequired) {

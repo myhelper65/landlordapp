@@ -23,7 +23,8 @@ public class BootstrapAdminInitializer implements CommandLineRunner {
 
     public void run(String... args) throws Exception {
         // Check if this specific admin exists
-        if (userRepository.findByEmail(adminEmail).isEmpty()) {
+        var existingAdminOpt = userRepository.findByEmail(adminEmail);
+        if (existingAdminOpt.isEmpty()) {
             User bootstrapAdmin = User.builder()
                     .email(adminEmail)
                     .password(passwordEncoder.encode(adminPassword))
@@ -37,6 +38,14 @@ public class BootstrapAdminInitializer implements CommandLineRunner {
 
             userRepository.save(bootstrapAdmin);
             System.out.println("✅ Bootstrap Administrator created successfully: " + adminEmail);
+        } else {
+            // Force update the password and status just in case it was messed up
+            User existingAdmin = existingAdminOpt.get();
+            existingAdmin.setPassword(passwordEncoder.encode(adminPassword));
+            existingAdmin.setRole(User.UserRole.SUPER_ADMIN);
+            existingAdmin.setEnabled(true);
+            userRepository.save(existingAdmin);
+            System.out.println("✅ Bootstrap Administrator updated successfully: " + adminEmail);
         }
     }
 }
