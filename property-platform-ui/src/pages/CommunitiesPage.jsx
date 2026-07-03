@@ -13,7 +13,7 @@ const CommunitiesPage = () => {
     const [open, setOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [newCommunity, setNewCommunity] = useState({
-        name: '', address: '', city: '', state: '', zipCode: ''
+        name: '', address: '', city: '', state: '', zipCode: '', numberOfUnits: '', unitPrefix: ''
     });
 
     const fetchData = async () => {
@@ -61,7 +61,7 @@ const CommunitiesPage = () => {
     };
 
     const openCreateModal = () => {
-        setNewCommunity({ name: '', address: '', city: '', state: '', zipCode: '' });
+        setNewCommunity({ name: '', address: '', city: '', state: '', zipCode: '', numberOfUnits: '', unitPrefix: '' });
         setIsEditMode(false);
         setOpen(true);
     };
@@ -115,6 +115,30 @@ const CommunitiesPage = () => {
                         <TextField fullWidth margin="normal" label="State" value={newCommunity.state} onChange={(e) => setNewCommunity({...newCommunity, state: e.target.value})} />
                         <TextField fullWidth margin="normal" label="Zip Code" value={newCommunity.zipCode} onChange={(e) => setNewCommunity({...newCommunity, zipCode: e.target.value})} />
                     </Box>
+                    {!isEditMode && (
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <TextField 
+                                fullWidth 
+                                margin="normal" 
+                                label="Unit Prefix (Optional, e.g. AB-)" 
+                                value={newCommunity.unitPrefix} 
+                                onChange={(e) => setNewCommunity({...newCommunity, unitPrefix: e.target.value})} 
+                            />
+                            <TextField 
+                                fullWidth 
+                                margin="normal" 
+                                label="Number of Units (e.g. 40)" 
+                                type="number"
+                                value={newCommunity.numberOfUnits} 
+                                onChange={(e) => setNewCommunity({...newCommunity, numberOfUnits: e.target.value ? parseInt(e.target.value) : ''})} 
+                            />
+                        </Box>
+                    )}
+                    {!isEditMode && (
+                        <Typography variant="caption" color="textSecondary" sx={{ ml: 1 }}>
+                            Example: Prefix "AB-" and 40 units will create AB-1, AB-2 ... AB-40.
+                        </Typography>
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Cancel</Button>

@@ -14,4 +14,8 @@ public class CommunityRequestDTO {
     private String state;
     private String zipCode;
     private String description;
+    
+    // Optional field to auto-generate units when creating a community
+    private Integer numberOfUnits;
+    private String unitPrefix;
 }

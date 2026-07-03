@@ -46,6 +46,28 @@ public class CommunityService {
         // 3. Veritabanına kaydet
         Community savedCommunity = communityRepository.save(community);
 
+        // BULK APARTMENT GENERATION LOGIC
+        if (request.getNumberOfUnits() != null && request.getNumberOfUnits() > 0) {
+            String prefix = request.getUnitPrefix() != null ? request.getUnitPrefix() : "";
+            java.util.List<com.property.platform.entity.Property> propertiesToCreate = new java.util.ArrayList<>();
+            for (int i = 1; i <= request.getNumberOfUnits(); i++) {
+                com.property.platform.entity.Property newProperty = com.property.platform.entity.Property.builder()
+                        .community(savedCommunity)
+                        .unitNumber(prefix + i) // e.g. "A-1" or "1"
+                        .propertyType(com.property.platform.entity.Property.PropertyType.APARTMENT)
+                        .status(com.property.platform.entity.Property.PropertyStatus.VACANT)
+                        .notes("Auto-generated")
+                        .build();
+                
+                newProperty.setId(UUID.randomUUID());
+                newProperty.setCreatedAt(Instant.now());
+                newProperty.setCreatedBy(savedCommunity.getCreatedBy());
+                
+                propertiesToCreate.add(newProperty);
+            }
+            propertyRepository.saveAll(propertiesToCreate);
+        }
+
         // 4. Entity'i tekrar Response DTO'ya dönüştür ve geri dön
         return CommunityResponseDTO.builder()
                 .id(savedCommunity.getId())
