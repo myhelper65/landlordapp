@@ -315,35 +315,47 @@ const PropertiesPage = () => {
                                     Status
                                 </TableSortLabel>
                             </TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Tenant</TableCell>
                             <TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {properties.map((p) => (
-                            <TableRow key={p.id}>
-                                <TableCell>{p.communityName || 'N/A'}</TableCell>
-                                <TableCell>{p.unitNumber}</TableCell>
-                                <TableCell>{p.propertyType || p.type}</TableCell>
+                        {properties.map((property) => (
+                            <TableRow key={property.id}>
+                                <TableCell>{property.communityName || 'N/A'}</TableCell>
+                                <TableCell>{property.unitNumber}</TableCell>
+                                <TableCell>{property.propertyType || property.type}</TableCell>
                                 <TableCell>
                                     <Chip
-                                        label={p.status}
-                                        color={p.status === 'VACANT' ? 'success' : p.status === 'OCCUPIED' ? 'error' : 'default'}
+                                        label={property.status}
+                                        color={property.status === 'VACANT' ? 'success' : property.status === 'OCCUPIED' ? 'error' : 'default'}
                                         size="small"
                                     />
                                 </TableCell>
+                                <TableCell>
+                                    {property.tenantName && property.tenantName !== 'No Active Tenant' ? (
+                                        <Box>
+                                            <Typography variant="body2" fontWeight="bold">{property.tenantName}</Typography>
+                                            {property.tenantEmail && <Typography variant="caption" display="block" color="textSecondary">{property.tenantEmail}</Typography>}
+                                            {property.tenantPhone && <Typography variant="caption" display="block" color="textSecondary">{property.tenantPhone}</Typography>}
+                                        </Box>
+                                    ) : (
+                                        <Typography variant="body2" color="textSecondary">None</Typography>
+                                    )}
+                                </TableCell>
                                 <TableCell align="center">
                                     {/* YENİ: DETAY GÖRÜNTÜLEME BUTONU */}
-                                    <IconButton color="info" onClick={() => openDetailsModal(p.id)} title="View Details & Documents">
+                                    <IconButton color="info" onClick={() => openDetailsModal(property.id)} title="View Details & Documents">
                                         <Visibility fontSize="small" />
                                     </IconButton>
 
-                                    <IconButton color="success" onClick={() => openRentModal(p.id)} title="Rent to Tenant">
+                                    <IconButton color="success" onClick={() => openRentModal(property.id)} title="Rent to Tenant">
                                         <PersonAdd fontSize="small" />
                                     </IconButton>
-                                    <IconButton color="primary" title="Edit" onClick={() => openEditModal(p)}>
+                                    <IconButton color="primary" title="Edit" onClick={() => openEditModal(property)}>
                                         <Edit fontSize="small" />
                                     </IconButton>
-                                    <IconButton color="error" title="Delete" onClick={() => handleDelete(p.id)}>
+                                    <IconButton color="error" title="Delete" onClick={() => handleDelete(property.id)}>
                                         <Delete fontSize="small" />
                                     </IconButton>
                                 </TableCell>

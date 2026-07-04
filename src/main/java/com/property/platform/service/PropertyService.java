@@ -70,7 +70,13 @@ public class PropertyService {
 
     public Page<PropertyResponseDTO> getAllProperties(String search, Pageable pageable) {
         return propertyRepository.searchProperties(search, pageable)
-                .map(property -> PropertyResponseDTO.builder()
+                .map(property -> {
+                    com.property.platform.entity.User tenant = userPropertyRepository.findByPropertyIdAndIsDeletedFalse(property.getId()).stream()
+                            .map(up -> up.getUser())
+                            .findFirst()
+                            .orElse(null);
+
+                    return PropertyResponseDTO.builder()
                         .id(property.getId())
                         .communityId(property.getCommunity().getId())
                         .communityName(property.getCommunity().getName())
@@ -78,7 +84,11 @@ public class PropertyService {
                         .propertyType(property.getPropertyType())
                         .status(property.getStatus())
                         .notes(property.getNotes())
-                        .build());
+                        .tenantName(tenant != null ? tenant.getFirstName() + " " + tenant.getLastName() : "No Active Tenant")
+                        .tenantEmail(tenant != null ? tenant.getEmail() : "")
+                        .tenantPhone(tenant != null ? tenant.getPhoneNumber() : "")
+                        .build();
+                });
     }
 
     public void deleteProperty(UUID id) {

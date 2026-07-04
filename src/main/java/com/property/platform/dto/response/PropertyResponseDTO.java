@@ -23,6 +23,8 @@ public class PropertyResponseDTO {
     
     // YENİ EKLENEN ALANLAR:
     private String tenantName; // Eğer mülk doluysa aktif kiracının adı soyadı
+    private String tenantEmail; 
+    private String tenantPhone;
     private List<DocumentDTO> documents; // Mülke ait belgelerin listesi
 
 
