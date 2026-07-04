@@ -36,18 +36,23 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
+    @Builder.Default
     @Column(name = "enabled", columnDefinition = "boolean default true")
     private boolean enabled = true;
 
+    @Builder.Default
     @Column(name = "email_verified", columnDefinition = "boolean default false")
     private boolean emailVerified = false;
 
+    @Builder.Default
     @Column(name = "first_login_required", columnDefinition = "boolean default false")
     private boolean firstLoginRequired = false;
 
+    @Builder.Default
     @Column(name = "account_locked", columnDefinition = "boolean default false")
     private boolean accountLocked = false;
 
+    @Builder.Default
     @Column(name = "failed_login_attempts", columnDefinition = "integer default 0")
     private int failedLoginAttempts = 0;
 
