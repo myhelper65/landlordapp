@@ -39,13 +39,25 @@ public class BootstrapAdminInitializer implements CommandLineRunner {
             userRepository.save(bootstrapAdmin);
             System.out.println("✅ Bootstrap Administrator created successfully: " + adminEmail);
         } else {
-            // Force update the password and status just in case it was messed up
+            // Rol ve durumu kontrol et, ancak ŞİFREYİ EZME!
             User existingAdmin = existingAdminOpt.get();
-            existingAdmin.setPassword(passwordEncoder.encode(adminPassword));
-            existingAdmin.setRole(User.UserRole.SUPER_ADMIN);
-            existingAdmin.setEnabled(true);
-            userRepository.save(existingAdmin);
-            System.out.println("✅ Bootstrap Administrator updated successfully: " + adminEmail);
+            boolean needsUpdate = false;
+            
+            if (existingAdmin.getRole() != User.UserRole.SUPER_ADMIN) {
+                existingAdmin.setRole(User.UserRole.SUPER_ADMIN);
+                needsUpdate = true;
+            }
+            if (!existingAdmin.isEnabled()) {
+                existingAdmin.setEnabled(true);
+                needsUpdate = true;
+            }
+            
+            if (needsUpdate) {
+                userRepository.save(existingAdmin);
+                System.out.println("✅ Bootstrap Administrator updated (roles/status only): " + adminEmail);
+            } else {
+                System.out.println("✅ Bootstrap Administrator already active: " + adminEmail);
+            }
         }
     }
 }
