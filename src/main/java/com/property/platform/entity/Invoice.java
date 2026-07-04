@@ -18,15 +18,9 @@ import java.time.LocalDate;
 public class Invoice extends BaseEntity {
 
 
-
-    // Sınıfın üstüne ekle
-    @SQLDelete(sql = "UPDATE invoices SET is_deleted = true WHERE id = ?")
-    @Where(clause = "is_deleted = false")
-
-// Alanlara ekle
-    @Builder.Default
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted = false;
+    // @SQLDelete and @Where commented out or removed because BaseEntity has @SQLRestriction("is_deleted = false")
+    // and they conflict or cause errors with Spring Data JPA updates if not handled correctly.
+    // Also removed duplicate isDeleted field.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false)
     private Property property;
