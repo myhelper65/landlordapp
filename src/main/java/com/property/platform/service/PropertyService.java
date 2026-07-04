@@ -92,7 +92,7 @@ public class PropertyService {
     }
 
     public List<PropertyResponseDTO> getAllPropertiesList() {
-        return propertyRepository.findAllByIsDeletedFalse()
+        return propertyRepository.findByIsDeletedFalse()
                 .stream()
                 .map(property -> PropertyResponseDTO.builder()
                         .id(property.getId())
