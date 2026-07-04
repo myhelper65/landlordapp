@@ -21,7 +21,8 @@ const TenantDashboard = () => {
         dueDate: '',
         openRequests: 0,
         recentMaintenanceRequests: [],
-        currentInvoiceId: null
+        currentInvoiceId: null,
+        isSuspended: false
     });
 
     const fetchTenantProfile = async () => {
@@ -37,7 +38,8 @@ const TenantDashboard = () => {
                 dueDate: realData.dueDate || '-',
                 openRequests: realData.openRequests || 0,
                 recentMaintenanceRequests: realData.recentMaintenanceRequests || [],
-                currentInvoiceId: realData.currentInvoiceId || null
+                currentInvoiceId: realData.currentInvoiceId || null,
+                isSuspended: realData.isSuspended || realData.suspended || false
             });
 
         } catch (error) {
@@ -70,6 +72,25 @@ const TenantDashboard = () => {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', bgcolor: theme.bgMain }}>
                 <CircularProgress />
+            </Box>
+        );
+    }
+
+    // YENİ EKLENEN: Hesap askıya alınmışsa (daire silinmişse vs.) gösterilecek kırmızı uyarı ekranı
+    if (tenantData.isSuspended) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 64px)', bgcolor: theme.bgMain, p: 2 }}>
+                <Card sx={{ maxWidth: 600, width: '100%', textAlign: 'center', p: 4, border: '2px solid #dc2626', borderRadius: 4, boxShadow: '0 10px 25px rgba(220, 38, 38, 0.2)' }}>
+                    <Typography variant="h4" sx={{ color: '#dc2626', fontWeight: 900, mb: 2, fontFamily: "'Merriweather', serif" }}>
+                        ACCOUNT SUSPENDED
+                    </Typography>
+                    <Typography variant="h6" sx={{ color: theme.textDark, mb: 2, fontWeight: 700 }}>
+                        This account is inactive and set to be deleted.
+                    </Typography>
+                    <Typography variant="body1" sx={{ color: theme.textGrey }}>
+                        Your assigned property is no longer active in the system. You cannot perform any actions at this time. Please contact your property manager if you believe this is an error.
+                    </Typography>
+                </Card>
             </Box>
         );
     }

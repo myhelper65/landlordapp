@@ -22,4 +22,5 @@ public class TenantDashboardResponseDTO {
     private UUID currentInvoiceId;
     // New field to pass dynamic maintenance data to the frontend
     private List<MaintenanceRequestSummaryDTO> recentMaintenanceRequests;
+    private boolean isSuspended;
 }

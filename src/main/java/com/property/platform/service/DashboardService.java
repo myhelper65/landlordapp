@@ -129,6 +129,12 @@ public class DashboardService {
                         .build())
                 .collect(Collectors.toList());
 
+        // 3. Hesapla: isSuspended (Daire silinmişse veya inaktifse)
+        boolean isSuspended = false;
+        if (assignment == null || assignment.getProperty() == null || assignment.getProperty().isDeleted() || assignment.getProperty().getStatus() == Property.PropertyStatus.INACTIVE) {
+            isSuspended = true;
+        }
+
         // --- BUILD RESPONSE ---
         return TenantDashboardResponseDTO.builder()
                 .firstName(tenant.getFirstName() != null ? tenant.getFirstName() : "Tenant")
@@ -139,6 +145,7 @@ public class DashboardService {
                 .currentInvoiceId(pendingInvoiceId)   // Fatura ödeme butonu için eklendi
                 .openRequests((int) openRequestsCount)
                 .recentMaintenanceRequests(recentRequests)
+                .isSuspended(isSuspended)
                 .build();
     }
 }
