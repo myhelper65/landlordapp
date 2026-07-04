@@ -39,6 +39,7 @@ public class UserController {
                 .email(request.getEmail())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
+                .phoneNumber(request.getPhoneNumber())
                 .role(User.UserRole.TENANT)
                 .password(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode(tempPassword))
                 .build();

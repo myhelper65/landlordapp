@@ -30,10 +30,10 @@ public class PropertyController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PropertyResponseDTO>> getAllProperties() {
-        // Eğer propertyService içinde getAllProperties metodu yoksa,
-        // repository.findAll() yapıp DTO'ya mapleyen basit bir metot yazman gerekebilir.
-        List<PropertyResponseDTO> properties = propertyService.getAllProperties();
+    public ResponseEntity<org.springframework.data.domain.Page<PropertyResponseDTO>> getAllProperties(
+            @RequestParam(required = false) String search,
+            org.springframework.data.domain.Pageable pageable) {
+        org.springframework.data.domain.Page<PropertyResponseDTO> properties = propertyService.getAllProperties(search, pageable);
         return ResponseEntity.ok(properties);
     }
 

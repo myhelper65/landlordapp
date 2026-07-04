@@ -5,6 +5,8 @@ import {
     TableContainer, TableHead, TableRow, CircularProgress, Button,
     Dialog, DialogTitle, DialogContent, TextField, DialogActions, IconButton,
     FormControl, InputLabel, Select, MenuItem, Chip, Grid, Card, CardMedia,
+    CardContent, CardActions, Divider, TablePagination, TableSortLabel
+    FormControl, InputLabel, Select, MenuItem, Chip, Grid, Card, CardMedia,
     CardContent, CardActions, Divider
 } from '@mui/material';
 import { Edit, Delete, PersonAdd, Visibility, CloudUpload, InsertDriveFile, PictureAsPdf } from '@mui/icons-material';
@@ -26,7 +28,7 @@ const PropertiesPage = () => {
     const [rentData, setRentData] = useState({ userId: '', propertyId: '', type: 'TENANT' });
 
     const [inviteModalOpen, setInviteModalOpen] = useState(false);
-    const [inviteData, setInviteData] = useState({ firstName: '', lastName: '', email: '' });
+    const [inviteData, setInviteData] = useState({ firstName: '', lastName: '', email: '', phoneNumber: '' });
 
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [newProperty, setNewProperty] = useState({ communityId: '', unitNumber: '', propertyType: 'SINGLE_FAMILY' });
@@ -43,10 +45,30 @@ const PropertiesPage = () => {
     // BASE URL for viewing files
     const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080');
 
+    // YENİ: Sayfalama, Sıralama, Arama State'leri
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [totalElements, setTotalElements] = useState(0);
+    const [sortField, setSortField] = useState('createdAt');
+    const [sortDir, setSortDir] = useState('desc');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+
+    // Arama için debounce
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+            setPage(0); // Arama değiştiğinde ilk sayfaya dön
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchQuery]);
+
     const fetchData = async () => {
         try {
-            const propData = await getAllProperties();
+            const sortParam = `${sortField},${sortDir}`;
+            const propData = await getAllProperties(page, rowsPerPage, sortParam, debouncedSearch);
             setProperties(propData?.content || propData || []);
+            setTotalElements(propData?.totalElements || (Array.isArray(propData) ? propData.length : 0));
 
             const userData = await getAllUsers();
             setUsers(userData?.content || userData || []);
@@ -60,7 +82,22 @@ const PropertiesPage = () => {
         }
     };
 
-    useEffect(() => { fetchData(); }, []);
+    useEffect(() => { fetchData(); }, [page, rowsPerPage, sortField, sortDir, debouncedSearch]);
+
+    const handleSort = (field) => {
+        const isAsc = sortField === field && sortDir === 'asc';
+        setSortDir(isAsc ? 'desc' : 'asc');
+        setSortField(field);
+    };
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     // --- MEVCUT İŞLEMLER (ADD, EDIT, RENT, DELETE) ---
     const handleAddSubmit = async () => {
@@ -115,7 +152,7 @@ const PropertiesPage = () => {
             const response = await inviteTenant(inviteData);
             alert(response.message || "Tenant invited successfully!");
             setInviteModalOpen(false);
-            setInviteData({ firstName: '', lastName: '', email: '' });
+            setInviteData({ firstName: '', lastName: '', email: '', phoneNumber: '' });
             fetchData(); // Refresh the users list
         } catch (error) {
             alert(error.response?.data?.message || "Failed to invite tenant.");
@@ -229,14 +266,57 @@ const PropertiesPage = () => {
                 </Button>
             </Box>
 
+            <Box sx={{ mb: 2 }}>
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Search by Community Name or Unit Number..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    size="small"
+                />
+            </Box>
+
             <TableContainer component={Paper} elevation={3}>
                 <Table>
                     <TableHead sx={{ bgcolor: '#f4f6f8' }}>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Community Name</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Unit Number</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Type</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>
+                                <TableSortLabel
+                                    active={sortField === 'community.name'}
+                                    direction={sortField === 'community.name' ? sortDir : 'asc'}
+                                    onClick={() => handleSort('community.name')}
+                                >
+                                    Community Name
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>
+                                <TableSortLabel
+                                    active={sortField === 'unitNumber'}
+                                    direction={sortField === 'unitNumber' ? sortDir : 'asc'}
+                                    onClick={() => handleSort('unitNumber')}
+                                >
+                                    Unit Number
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>
+                                <TableSortLabel
+                                    active={sortField === 'propertyType'}
+                                    direction={sortField === 'propertyType' ? sortDir : 'asc'}
+                                    onClick={() => handleSort('propertyType')}
+                                >
+                                    Type
+                                </TableSortLabel>
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>
+                                <TableSortLabel
+                                    active={sortField === 'status'}
+                                    direction={sortField === 'status' ? sortDir : 'asc'}
+                                    onClick={() => handleSort('status')}
+                                >
+                                    Status
+                                </TableSortLabel>
+                            </TableCell>
                             <TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -281,6 +361,14 @@ const PropertiesPage = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <TablePagination
+                component="div"
+                count={totalElements}
+                page={page}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+            />
 
             {/* --- DETAILS & DOCUMENTS MODAL (YENİ EKLENDİ) --- */}
             <Dialog open={detailsModalOpen} onClose={() => setDetailsModalOpen(false)} fullWidth maxWidth="md">
@@ -451,6 +539,7 @@ const PropertiesPage = () => {
                     <TextField fullWidth margin="normal" label="First Name" value={inviteData.firstName} onChange={(e) => setInviteData({ ...inviteData, firstName: e.target.value })} required />
                     <TextField fullWidth margin="normal" label="Last Name" value={inviteData.lastName} onChange={(e) => setInviteData({ ...inviteData, lastName: e.target.value })} required />
                     <TextField fullWidth margin="normal" label="Email Address" type="email" value={inviteData.email} onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })} required />
+                    <TextField fullWidth margin="normal" label="Phone Number" value={inviteData.phoneNumber} onChange={(e) => setInviteData({ ...inviteData, phoneNumber: e.target.value })} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setInviteModalOpen(false)}>Cancel</Button>

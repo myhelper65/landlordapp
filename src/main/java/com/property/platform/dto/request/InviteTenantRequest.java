@@ -15,4 +15,6 @@ public class InviteTenantRequest {
 
     @NotBlank
     private String lastName;
+
+    private String phoneNumber;
 }

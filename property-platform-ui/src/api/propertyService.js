@@ -1,10 +1,15 @@
 // src/api/propertyService.js
 import axiosInstance from './axiosInstance';
 
-export const getAllProperties = async () => {
-    // Backend'deki endpoint'in GET /api/v1/properties olduğunu varsayıyoruz.
-    // Eğer endpoint farklıysa, lütfen burayı backend API yapınıza göre güncelleyin.
-    const response = await axiosInstance.get('/properties');
+export const getAllProperties = async (page = 0, size = 10, sort = 'createdAt,desc', search = '') => {
+    const response = await axiosInstance.get('/properties', {
+        params: {
+            page,
+            size,
+            sort,
+            search
+        }
+    });
     return response.data;
 };
 

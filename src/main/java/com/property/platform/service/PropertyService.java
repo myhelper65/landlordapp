@@ -15,6 +15,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -66,10 +68,8 @@ public class PropertyService {
                 .build();
     }
 
-    public List<PropertyResponseDTO> getAllProperties() {
-        // Sadece silinmemiş olanları (isDeleted = false) getir
-        return propertyRepository.findByIsDeletedFalse()
-                .stream()
+    public Page<PropertyResponseDTO> getAllProperties(String search, Pageable pageable) {
+        return propertyRepository.searchProperties(search, pageable)
                 .map(property -> PropertyResponseDTO.builder()
                         .id(property.getId())
                         .communityId(property.getCommunity().getId())
@@ -78,8 +78,7 @@ public class PropertyService {
                         .propertyType(property.getPropertyType())
                         .status(property.getStatus())
                         .notes(property.getNotes())
-                        .build())
-                .collect(Collectors.toList());
+                        .build());
     }
 
     public void deleteProperty(UUID id) {
