@@ -40,7 +40,7 @@ const Invoices = () => {
 
             const [invoicesRes, propertiesRes] = await Promise.all([
                 axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/invoices`, { headers }),
-                axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/properties`, { headers })
+                axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/api/v1/properties/all`, { headers })
             ]);
 
             setInvoices(invoicesRes.data);

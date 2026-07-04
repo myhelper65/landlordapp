@@ -43,6 +43,11 @@ public class PropertyController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<PropertyResponseDTO>> getAllPropertiesList() {
+        return ResponseEntity.ok(propertyService.getAllPropertiesList());
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<PropertyResponseDTO> updateProperty(
             @PathVariable UUID id,

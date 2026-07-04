@@ -91,6 +91,20 @@ public class PropertyService {
                 });
     }
 
+    public List<PropertyResponseDTO> getAllPropertiesList() {
+        return propertyRepository.findAllByIsDeletedFalse()
+                .stream()
+                .map(property -> PropertyResponseDTO.builder()
+                        .id(property.getId())
+                        .communityId(property.getCommunity().getId())
+                        .communityName(property.getCommunity().getName())
+                        .unitNumber(property.getUnitNumber())
+                        .propertyType(property.getPropertyType())
+                        .status(property.getStatus())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     public void deleteProperty(UUID id) {
         Property property = propertyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Silinecek mülk bulunamadı!"));
