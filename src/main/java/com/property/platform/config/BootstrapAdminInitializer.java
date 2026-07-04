@@ -18,7 +18,7 @@ public class BootstrapAdminInitializer implements CommandLineRunner {
     @Value("${bootstrap.admin.email:admin@propertymanager.com}")
     private String adminEmail;
 
-    @Value("${bootstrap.admin.password:Admin@12345!}")
+    @Value("${bootstrap.admin.password:Admin1234}")
     private String adminPassword;
 
     public void run(String... args) throws Exception {
