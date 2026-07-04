@@ -199,7 +199,7 @@ const Invoices = () => {
                                     <TableCell sx={{ color: theme.textDark, fontWeight: 500 }}>{invoice.description}</TableCell>
                                     <TableCell sx={{ color: theme.textGrey }}>{invoice.propertyName}</TableCell>
                                     <TableCell sx={{ color: theme.textGrey }}>{invoice.tenantName}</TableCell>
-                                    <TableCell sx={{ color: theme.textDark, fontWeight: 600 }}>${invoice.amount.toLocaleString()}</TableCell>
+                                    <TableCell sx={{ color: theme.textDark, fontWeight: 600 }}>${(invoice.amount || 0).toLocaleString()}</TableCell>
                                     <TableCell sx={{ color: theme.textGrey }}>{invoice.dueDate}</TableCell>
                                     <TableCell>{getStatusChip(invoice.status)}</TableCell>
                                     <TableCell align="right">
@@ -316,7 +316,7 @@ const Invoices = () => {
                                 <TableRow key={inv.id}>
                                     <TableCell>{inv.dueDate}</TableCell>
                                     <TableCell>{inv.description}</TableCell>
-                                    <TableCell sx={{ fontWeight: 600 }}>${inv.amount.toLocaleString()}</TableCell>
+                                    <TableCell sx={{ fontWeight: 600 }}>${(inv.amount || 0).toLocaleString()}</TableCell>
                                     <TableCell>{getStatusChip(inv.status)}</TableCell>
                                 </TableRow>
                             ))}
