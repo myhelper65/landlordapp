@@ -20,12 +20,33 @@ public class UserPropertyService {
     private final UserPropertyRepository userPropertyRepository;
     private final UserRepository userRepository;
     private final PropertyRepository propertyRepository;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     public PropertyAssignmentResponseDTO assignUserToProperty(PropertyAssignmentRequestDTO request) {
 
-        // 1. Kullanıcı kontrolü
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("Belirtilen kullanıcı sistemde bulunamadı!"));
+        // 1. Kullanıcı kontrolü veya oluşturulması
+        User user;
+        if (request.getUserId() != null) {
+            user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new RuntimeException("Belirtilen kullanıcı sistemde bulunamadı!"));
+        } else {
+            if (request.getEmail() == null || request.getEmail().isBlank()) {
+                throw new RuntimeException("Yeni kiracı oluşturmak için email adresi zorunludur!");
+            }
+            // Check if exists
+            user = userRepository.findByEmail(request.getEmail()).orElseGet(() -> {
+                User newUser = User.builder()
+                        .email(request.getEmail())
+                        .firstName(request.getFirstName())
+                        .lastName(request.getLastName())
+                        .phoneNumber(request.getPhoneNumber())
+                        .role(User.UserRole.TENANT)
+                        .password(passwordEncoder.encode("welcome123")) // Temp password
+                        .firstLoginRequired(true)
+                        .build();
+                return userRepository.save(newUser);
+            });
+        }
 
         // 2. Mülk kontrolü
         Property property = propertyRepository.findByIdAndIsDeletedFalse(request.getPropertyId())

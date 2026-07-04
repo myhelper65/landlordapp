@@ -5,6 +5,7 @@ import { GlobalStyles, Typography, Box } from '@mui/material';
 // Sayfa İçe Aktarımları
 import LoginPage from './pages/LoginPage';
 import FirstSetupPage from './pages/FirstSetupPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 import AdminDashboard from './pages/AdminDashboard';
 import TenantDashboard from './pages/TenantDashboard';
 import PropertiesPage from './pages/PropertiesPage';
@@ -60,6 +61,16 @@ function App() {
                     element={
                         <ProtectedRoute isSetupRoute={true}>
                             <FirstSetupPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Change Password Rota - Layout olmadan, tam ekran form */}
+                <Route
+                    path="/change-password"
+                    element={
+                        <ProtectedRoute isSetupRoute={true}>
+                            <ChangePasswordPage />
                         </ProtectedRoute>
                     }
                 />

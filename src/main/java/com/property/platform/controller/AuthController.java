@@ -24,6 +24,21 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(request));
     }
 
+    @PostMapping("/change-password")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> changePassword(
+            @RequestBody com.property.platform.dto.request.ChangePasswordRequestDTO request,
+            org.springframework.security.core.Authentication authentication) {
+        
+        com.property.platform.entity.User user = (com.property.platform.entity.User) authentication.getPrincipal();
+        try {
+            authService.changePassword(request, user.getId());
+            return ResponseEntity.ok(java.util.Map.of("message", "Şifreniz başarıyla güncellendi."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("message", e.getMessage()));
+        }
+    }
+
     @PostMapping("/google")
     public ResponseEntity<AuthResponseDTO> googleLogin(@RequestBody com.property.platform.dto.request.GoogleLoginRequest request) {
         try {

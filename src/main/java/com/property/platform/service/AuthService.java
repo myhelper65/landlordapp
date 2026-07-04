@@ -43,6 +43,18 @@ public class AuthService {
                 .build();
     }
 
+    public void changePassword(com.property.platform.dto.request.ChangePasswordRequestDTO request, java.util.UUID userId) {
+        var user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new RuntimeException("Mevcut şifre yanlış!");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setFirstLoginRequired(false); // Kullanıcı kendi şifresini belirlediğine göre artık bu zorunluluk kalkıyor
+        userRepository.save(user);
+    }
+
     public AuthResponseDTO register(com.property.platform.dto.request.RegisterRequestDTO request) {
 
         // 1. Postman'dan gelen rolü güvenli bir şekilde belirle

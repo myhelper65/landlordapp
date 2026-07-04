@@ -13,12 +13,15 @@ const ProtectedRoute = ({ children, allowedRoles, isSetupRoute }) => {
         return <Navigate to="/login" replace />;
     }
 
-    // 2. KONTROL: Eğer First Setup gerekiyorsa ve şu an First Setup sayfasında değilsek, oraya zorla
+    // 2. KONTROL: Eğer First Setup gerekiyorsa ve şu an First Setup veya Change Password sayfasında değilsek
     if (firstLoginRequired && !isSetupRoute) {
+        if (userRole === 'TENANT') {
+            return <Navigate to="/change-password" replace />;
+        }
         return <Navigate to="/first-setup" replace />;
     }
 
-    // 3. KONTROL: Eğer First Setup gerekMİYORSA ama şu an First Setup sayfasındaysak, dashboard'a gönder
+    // 3. KONTROL: Eğer First Setup gerekMİYORSA ama şu an First Setup/Change Password sayfasındaysak, dashboard'a gönder
     if (!firstLoginRequired && isSetupRoute) {
         return <Navigate to="/dashboard" replace />;
     }

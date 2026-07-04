@@ -12,7 +12,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class PropertyAssignmentRequestDTO {
-    private UUID userId;
+    private UUID userId; // Now optional if creating a new tenant
     private UUID propertyId;
     private UserProperty.RelationshipType type; // OWNER, TENANT, PROPERTY_MANAGER, MAINTENANCE_TECH
+    
+    // New fields for creating a tenant on the fly
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phoneNumber;
 }

@@ -12,8 +12,17 @@ export const login = async (email, password) => {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('role', response.data.role);
         localStorage.setItem('email', response.data.email);
+        localStorage.setItem('firstLoginRequired', response.data.firstLoginRequired);
     }
 
+    return response.data;
+};
+
+export const changePassword = async (currentPassword, newPassword) => {
+    const response = await axiosInstance.post('/auth/change-password', {
+        currentPassword,
+        newPassword
+    });
     return response.data;
 };
 
@@ -33,6 +42,7 @@ export const loginWithGoogle = async (credential) => {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('role', response.data.role);
         localStorage.setItem('email', response.data.email);
+        localStorage.setItem('firstLoginRequired', response.data.firstLoginRequired);
     }
     
     return response.data;

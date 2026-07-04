@@ -23,7 +23,16 @@ const PropertiesPage = () => {
 
     // Form State'leri
     const [rentModalOpen, setRentModalOpen] = useState(false);
-    const [rentData, setRentData] = useState({ userId: '', propertyId: '', type: 'TENANT' });
+    const [rentMode, setRentMode] = useState('NEW'); // 'NEW' veya 'EXISTING'
+    const [rentData, setRentData] = useState({ 
+        userId: '', 
+        propertyId: '', 
+        type: 'TENANT',
+        firstName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: ''
+    });
 
     const [inviteModalOpen, setInviteModalOpen] = useState(false);
     const [inviteData, setInviteData] = useState({ firstName: '', lastName: '', email: '', phoneNumber: '' });
@@ -130,18 +139,42 @@ const PropertiesPage = () => {
     };
 
     const openRentModal = (propertyId) => {
-        setRentData({ userId: '', propertyId: propertyId, type: 'TENANT' });
+        setRentData({ 
+            userId: '', 
+            propertyId: propertyId, 
+            type: 'TENANT',
+            firstName: '',
+            lastName: '',
+            email: '',
+            phoneNumber: ''
+        });
+        setRentMode('NEW');
         setRentModalOpen(true);
     };
 
     const handleRentSubmit = async () => {
         try {
-            await assignUserToProperty(rentData);
-            alert("Action successfully!");
+            // Sadece seçili moda göre datayı temizle
+            const payload = { ...rentData };
+            if (rentMode === 'NEW') {
+                payload.userId = null; // Backend anlasın diye
+            } else {
+                payload.firstName = null;
+                payload.lastName = null;
+                payload.email = null;
+                payload.phoneNumber = null;
+            }
+
+            await assignUserToProperty(payload);
+            if (rentMode === 'NEW') {
+                alert("Tenant created and assigned! Temporary password is: welcome123");
+            } else {
+                alert("Property assigned to tenant successfully!");
+            }
             setRentModalOpen(false);
             fetchData();
         } catch (error) {
-            alert(error.response?.data?.message || "Failed action.");
+            alert(error.response?.data?.message || "Failed to assign property.");
         }
     };
 
@@ -512,48 +545,72 @@ const PropertiesPage = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* RENT MODAL */}
+            {/* COMBINED RENT & INVITE MODAL */}
             <Dialog open={rentModalOpen} onClose={() => setRentModalOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle>Rent Property to Tenant</DialogTitle>
                 <DialogContent>
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel>Select Tenant</InputLabel>
-                        <Select value={rentData.userId} label="Select Tenant" onChange={(e) => setRentData({ ...rentData, userId: e.target.value })}>
-                            {users.map((user) => (
-                                <MenuItem key={user.id} value={user.id}>
-                                    {user.firstName} {user.lastName} ({user.email})
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <Box sx={{ mt: 2, textAlign: 'center' }}>
-                        <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>Can't find the tenant in the list?</Typography>
-                        <Button variant="outlined" size="small" onClick={() => { setRentModalOpen(false); setInviteModalOpen(true); }}>
-                            Invite New Tenant
+                    <Box sx={{ display: 'flex', gap: 2, mb: 3, mt: 1 }}>
+                        <Button 
+                            fullWidth 
+                            variant={rentMode === 'NEW' ? 'contained' : 'outlined'} 
+                            onClick={() => setRentMode('NEW')}
+                        >
+                            Create New Tenant
+                        </Button>
+                        <Button 
+                            fullWidth 
+                            variant={rentMode === 'EXISTING' ? 'contained' : 'outlined'} 
+                            onClick={() => setRentMode('EXISTING')}
+                        >
+                            Select Existing
                         </Button>
                     </Box>
+
+                    {rentMode === 'NEW' && (
+                        <>
+                            <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+                                Enter the tenant's details. The system will create an account and assign a temporary passcode.
+                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField fullWidth label="First Name" value={rentData.firstName} onChange={(e) => setRentData({ ...rentData, firstName: e.target.value })} required />
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <TextField fullWidth label="Last Name" value={rentData.lastName} onChange={(e) => setRentData({ ...rentData, lastName: e.target.value })} required />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField fullWidth label="Email Address" type="email" value={rentData.email} onChange={(e) => setRentData({ ...rentData, email: e.target.value })} required />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField fullWidth label="Phone Number" value={rentData.phoneNumber} onChange={(e) => setRentData({ ...rentData, phoneNumber: e.target.value })} />
+                                </Grid>
+                            </Grid>
+                        </>
+                    )}
+
+                    {rentMode === 'EXISTING' && (
+                        <FormControl fullWidth margin="normal">
+                            <InputLabel>Select Tenant</InputLabel>
+                            <Select value={rentData.userId} label="Select Tenant" onChange={(e) => setRentData({ ...rentData, userId: e.target.value })}>
+                                {users.map((user) => (
+                                    <MenuItem key={user.id} value={user.id}>
+                                        {user.firstName} {user.lastName} ({user.email})
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    )}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setRentModalOpen(false)}>Cancel</Button>
-                    <Button variant="contained" color="success" onClick={handleRentSubmit}>Confirm Rent</Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* INVITE TENANT MODAL */}
-            <Dialog open={inviteModalOpen} onClose={() => setInviteModalOpen(false)} fullWidth maxWidth="sm">
-                <DialogTitle>Invite New Tenant</DialogTitle>
-                <DialogContent>
-                    <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                        Create a pending account for the tenant. They will use this email to log in via Google.
-                    </Typography>
-                    <TextField fullWidth margin="normal" label="First Name" value={inviteData.firstName} onChange={(e) => setInviteData({ ...inviteData, firstName: e.target.value })} required />
-                    <TextField fullWidth margin="normal" label="Last Name" value={inviteData.lastName} onChange={(e) => setInviteData({ ...inviteData, lastName: e.target.value })} required />
-                    <TextField fullWidth margin="normal" label="Email Address" type="email" value={inviteData.email} onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })} required />
-                    <TextField fullWidth margin="normal" label="Phone Number" value={inviteData.phoneNumber} onChange={(e) => setInviteData({ ...inviteData, phoneNumber: e.target.value })} />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setInviteModalOpen(false)}>Cancel</Button>
-                    <Button variant="contained" color="primary" onClick={handleInviteSubmit} disabled={!inviteData.email || !inviteData.firstName}>Send Invitation</Button>
+                    <Button 
+                        variant="contained" 
+                        color="success" 
+                        onClick={handleRentSubmit}
+                        disabled={rentMode === 'NEW' ? (!rentData.firstName || !rentData.lastName || !rentData.email) : !rentData.userId}
+                    >
+                        Confirm Rent
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Container>
