@@ -47,7 +47,7 @@ public class InvoiceService {
             // Formda kiracı seçilmemişse, bu daireye atanmış aktif kiracıyı bul
             user = userPropertyRepository.findByPropertyIdAndIsDeletedFalse(property.getId())
                     .stream()
-                    .filter(up -> up.getType() == com.property.platform.entity.UserProperty.AssignmentType.TENANT)
+                    .filter(up -> up.getType() == com.property.platform.entity.UserProperty.RelationshipType.TENANT)
                     .max(java.util.Comparator.comparing(com.property.platform.entity.UserProperty::getCreatedAt)) // En son ekleneni (aktif kiracıyı) al
                     .map(up -> up.getUser())
                     .orElseThrow(() -> new RuntimeException("Hata: Bu daireye atanmış aktif bir kiracı yok. Fatura kesilemez!"));
